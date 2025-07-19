@@ -132,29 +132,30 @@ class EmployeeListView(generics.ListAPIView):
 class EmployeeViewSet(viewsets.ModelViewSet):
     """
     A full CRUD ViewSet for Admins to manage employees.
-    Provides list, detail, create, update, and delete functionality.
     """
-    permission_classes = [IsAdminUser] # Protect all actions in this ViewSet
+    permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        """
-        This ViewSet should only ever operate on users with the 'employee' role.
-        """
         return User.objects.filter(role=User.Role.EMPLOYEE)
 
     def get_serializer_class(self):
         """
-        Use different serializers for different actions.
+        --- THIS LOGIC IS CRITICAL ---
+        This method ensures the right serializer is used for the right action.
         """
+        # For listing employees, use a simple, read-only serializer.
         if self.action == 'list':
-            # For the list view, use the simple EmployeeListSerializer.
             return EmployeeListSerializer
-        # For 'create', 'update', 'retrieve' actions, use the more detailed
-        # UserRegistrationSerializer which includes all fields.
+        
+        # For ALL other actions (create, update, retrieve), use the
+        # detailed registration serializer that handles all fields.
         return UserRegistrationSerializer
 
     def get_serializer_context(self):
         """
-        Pass the 'employee' role to the serializer when creating a new employee.
+        Pass the 'employee' role to the serializer during creation.
         """
-        return {'role': 'employee'}
+        # We only need to provide this context for the 'create' action.
+        if self.action == 'create':
+            return {'role': 'employee'}
+        return {}
