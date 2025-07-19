@@ -111,11 +111,24 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Shorter access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,  # Important security feature
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT first
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Global default
     ]
 }
 
@@ -153,29 +166,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 APPEND_SLASH = True
 
-SIMPLE_JWT = {
-    # How long the ACCESS token is valid for.
-    # This is the "daily pass" that the user sends with every request.
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-
-    # How long the REFRESH token is valid for.
-    # This is the "master key" used to get a new access token.
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-
-    # --- Other useful settings ---
-
-    # If you want to be able to refresh tokens that are still valid
-    'ROTATE_REFRESH_TOKENS': False,
-    
-    # If you want to blacklist tokens after they are used for refreshing
-    'BLACKLIST_AFTER_ROTATION': False,
-    
-    # The algorithm used to sign the tokens
-    'ALGORITHM': 'HS256',
-    
-    # This is the same as your project's SECRET_KEY
-    'SIGNING_KEY': SECRET_KEY,
-}
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -183,4 +173,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5174',
     # 'https://cchlgv9x-5174.inc1.devtunnels.ms/',
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS.copy()
 
