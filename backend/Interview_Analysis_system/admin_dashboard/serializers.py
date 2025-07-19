@@ -8,13 +8,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 # --- NEW, SIMPLIFIED LOGIN SERIALIZER ---
 class LoginSerializer(serializers.Serializer):
     """
-    Handles user login and returns a clean JSON response with ONLY the tokens.
+    Handles user login and returns tokens along with user details.
     """
-    # --- THIS IS THE FIX ---
-    # We mark 'email' as write_only so it is used for input validation
-    # but NOT for creating the output response.
     email = serializers.EmailField(write_only=True)
-    
     password = serializers.CharField(
         style={'input_type': 'password'},
         write_only=True
@@ -27,16 +23,23 @@ class LoginSerializer(serializers.Serializer):
         if not user or not user.is_active:
             raise serializers.ValidationError("Incorrect credentials or user account is inactive.")
 
+        # --- THE FIX IS HERE ---
         # If authentication is successful, generate the tokens.
         refresh = RefreshToken.for_user(user)
 
-        # Return a dictionary containing ONLY the tokens.
-        # Since 'email' is now write_only, the serializer will not look for it here.
+        # We now return a dictionary with a nested structure for clarity.
         return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            },
+            'user_details': {
+                'id': user.id,
+                'full_name': user.full_name,
+                'email': user.email,
+                'role': user.role,
+            }
         }
-
 
 # --- THIS REGISTRATION SERIALIZER STAYS THE SAME ---
 class UserRegistrationSerializer(serializers.ModelSerializer):

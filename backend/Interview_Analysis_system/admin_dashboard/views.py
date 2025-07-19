@@ -9,7 +9,7 @@ from .permissions import IsAdminUser
 # --- NEW, SIMPLIFIED LOGIN VIEW ---
 class LoginAPIView(APIView):
     """
-    This is our completely custom login view. It will force the use of 'email'.
+    This is our completely custom login view.
     """
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
@@ -18,7 +18,10 @@ class LoginAPIView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # --- THIS IS THE FIX ---
+        # We return serializer.validated_data because it contains the rich
+        # dictionary we built in the serializer's .validate() method.
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 # --- THESE REGISTRATION VIEWS STAY THE SAME ---
