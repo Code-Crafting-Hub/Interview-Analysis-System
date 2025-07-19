@@ -107,7 +107,7 @@ export default function Sidebar() {
         </nav>
         <footer className="border-t-2 p-4 flex flex-col items-baseline">
           <Link
-            to="/hr/settings"
+            to="/settings"
             className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
           >
             <IoSettingsOutline />
