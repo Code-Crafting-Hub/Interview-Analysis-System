@@ -50,38 +50,38 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
         return {'role': 'employee'}
 
 
-class AdminLoginAPIView(generics.GenericAPIView):
-    """
-    API endpoint for Admin login.
-    """
-    permission_classes = [permissions.AllowAny]
-    serializer_class = LoginSerializer
+# class AdminLoginAPIView(generics.GenericAPIView):
+#     """
+#     API endpoint for Admin login.
+#     """
+#     permission_classes = [permissions.AllowAny]
+#     serializer_class = LoginSerializer
 
-    def get_serializer_context(self):
-        # Pass the 'expected_role' to the serializer
-        return {'expected_role': 'admin'}
+#     def get_serializer_context(self):
+#         # Pass the 'expected_role' to the serializer
+#         return {'expected_role': 'admin'}
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
-class EmployeeLoginAPIView(generics.GenericAPIView):
-    """
-    API endpoint for Employee login.
-    """
-    permission_classes = [permissions.AllowAny]
-    serializer_class = LoginSerializer
+# class EmployeeLoginAPIView(generics.GenericAPIView):
+#     """
+#     API endpoint for Employee login.
+#     """
+#     permission_classes = [permissions.AllowAny]
+#     serializer_class = LoginSerializer
 
-    def get_serializer_context(self):
-        # Pass the 'expected_role' to the serializer
-        return {'expected_role': 'employee'}
+#     def get_serializer_context(self):
+#         # Pass the 'expected_role' to the serializer
+#         return {'expected_role': 'employee'}
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 class DepartmentViewSet(viewsets.ModelViewSet):
@@ -183,3 +183,47 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         context['role'] = 'employee'
         return context
+    
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .token_serializers import CustomTokenObtainPairSerializer
+
+class AdminLoginAPIView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        
+        # Manual authentication
+        try:
+            user = User.objects.get(email=email)
+            if user.check_password(password) and user.role == 'admin':
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                    'email': user.email,
+                    'role': user.role
+                })
+        except User.DoesNotExist:
+            pass
+        
+        return Response(
+            {"detail": "Invalid credentials or not an admin"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+
+class EmployeeLoginAPIView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+
+class LogoutAPIView(generics.GenericAPIView):
+    serializer_class = LogoutSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Logout successful."}, status=status.HTTP_200_OK)

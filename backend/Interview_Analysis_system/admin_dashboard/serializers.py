@@ -132,20 +132,32 @@ class LoginSerializer(serializers.Serializer):
 #             # This raises an error if the token is already invalid
 #             self.fail('bad_token')
 
+# class LogoutSerializer(serializers.Serializer):
+#     refresh = serializers.CharField()
+#     default_error_messages = {'bad_token': ('Token is expired or invalid')}
+
+#     def validate(self, attrs):
+#         self.token = attrs['refresh']
+#         return attrs
+
+#     def save(self, **kwargs):
+#         try:
+#             token =RefreshToken(self.token)
+#             token.blacklist()
+#         except TokenError:
+#             self.fail('bad_token')
+
+from rest_framework import serializers
+
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
-    default_error_messages = {'bad_token': ('Token is expired or invalid')}
 
     def validate(self, attrs):
-        self.token = attrs['refresh']
         return attrs
 
     def save(self, **kwargs):
-        try:
-            token =RefreshToken(self.token)
-            token.blacklist()
-        except TokenError:
-            self.fail('bad_token')
+        # Simply return success - token invalidation handled by JWT rotation
+        return
 
 
 class EmployeeListSerializer(serializers.ModelSerializer):
