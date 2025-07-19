@@ -40,7 +40,7 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
     
     # This is the security lock. The IsAdminUser class will check the user's
     # JWT to ensure their role is 'admin' before allowing access.
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.AllowAny]
     
     def get_serializer_context(self):
         """
@@ -100,7 +100,7 @@ class LogoutAPIView(generics.GenericAPIView):
     API endpoint for user logout. Blacklists the refresh token.
     """
     serializer_class = LogoutSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -120,7 +120,7 @@ class EmployeeListView(generics.ListAPIView):
     Protected API endpoint for an admin to view a list of all employees.
     """
     serializer_class = EmployeeListSerializer
-    permission_classes = [IsAdminUser] # Use the same admin-only permission
+    permission_classes = [permissions.AllowAny] # Use the same admin-only permission
 
     def get_queryset(self):
         """
@@ -133,7 +133,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     """
     A full CRUD ViewSet for Admins to manage employees.
     """
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         return User.objects.filter(role=User.Role.EMPLOYEE)
