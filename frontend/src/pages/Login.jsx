@@ -20,7 +20,7 @@ export default function Login() {
   const [pass, setPass] = React.useState("password");
   const navigate = useNavigate("/hr/dashboard");
 
-  const backUrl = import.meta.env.VITE_BACKEND_URL
+  const back_Url = import.meta.env.VITE_BACKEND_URL
 
   const passViewHandler = () => {
     setPassview((prev) => {
@@ -33,7 +33,6 @@ export default function Login() {
   const submitForm = async (e) => {
     e.preventDefault();
     try {
-      const data = { email, password, loginType };
       if (!email || !password || !loginType) {
         Swal.fire({
           position: "center",
@@ -44,8 +43,26 @@ export default function Login() {
         });
         return;
       }
-      if (loginType === "admin") {
-        const res = await axios.post(`${backUrl}login/`, data, {
+      const data = { email, password };
+      const dataType = loginType
+      if (dataType === "admin") {
+        const res = await axios.post(`${back_Url}admin/login/`, data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        localStorage.setItem("atoken", res.data.tokens.access);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Login successfull",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigate("/hr/dashboard");
+      }
+      if(dataType === 'employee'){
+        const res = await axios.post(`${back_Url}employee/login/`, data, {
           headers: {
             "Content-Type": "application/json",
           },
@@ -58,17 +75,14 @@ export default function Login() {
           showConfirmButton: false,
           timer: 1500,
         });
-        navigate("/hr/dashboard");
-      }
-      if(loginType === 'employee'){
-        const res = await axios.post("")
-        console.log("res",res)
+        navigate("/performance");
       }
     } catch (error) {
+        console.log(error)
       Swal.fire({
         position: "center",
         icon: "error",
-        title: "Error while submitting form",
+        title: "Invalid credentials",
         showConfirmButton: false,
         timer: 1500,
       });
