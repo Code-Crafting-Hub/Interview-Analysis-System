@@ -152,10 +152,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         return UserRegistrationSerializer
 
     def get_serializer_context(self):
-        """
-        Pass the 'employee' role to the serializer during creation.
-        """
-        # We only need to provide this context for the 'create' action.
-        if self.action == 'create':
-            return {'role': 'employee'}
-        return {}
+        """Always pass 'employee' role in context"""
+        context = super().get_serializer_context()
+        context['role'] = 'employee'
+        return context
