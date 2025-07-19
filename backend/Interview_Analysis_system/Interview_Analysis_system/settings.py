@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -153,8 +153,34 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 APPEND_SLASH = True
 
+SIMPLE_JWT = {
+    # How long the ACCESS token is valid for.
+    # This is the "daily pass" that the user sends with every request.
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+
+    # How long the REFRESH token is valid for.
+    # This is the "master key" used to get a new access token.
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+
+    # --- Other useful settings ---
+
+    # If you want to be able to refresh tokens that are still valid
+    'ROTATE_REFRESH_TOKENS': False,
+    
+    # If you want to blacklist tokens after they are used for refreshing
+    'BLACKLIST_AFTER_ROTATION': False,
+    
+    # The algorithm used to sign the tokens
+    'ALGORITHM': 'HS256',
+    
+    # This is the same as your project's SECRET_KEY
+    'SIGNING_KEY': SECRET_KEY,
+}
+
+
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5174',
     'http://127.0.0.1:5174',
     # 'https://cchlgv9x-5174.inc1.devtunnels.ms/',
 ]
+
