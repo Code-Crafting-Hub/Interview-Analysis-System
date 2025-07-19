@@ -10,6 +10,7 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { FaEyeSlash } from "react-icons/fa";
 import { FaRegEye } from "react-icons/fa";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = React.useState("");
@@ -17,6 +18,7 @@ export default function Login() {
   const [loginType, setLoginType] = React.useState("");
   const [passView, setPassview] = React.useState(false);
   const [pass, setPass] = React.useState("password");
+  const navigate = useNavigate("/hr/dashboard");
 
   const passViewHandler = () => {
     setPassview((prev) => {
@@ -40,13 +42,26 @@ export default function Login() {
         });
         return;
       }
-      const res = await axios.post("http://127.0.0.1:8000/api/login/", data, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("res:",res)
+      if (loginType === "admin") {
+        const res = await axios.post("http://127.0.0.1:8000/api/login/", data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        localStorage.setItem("token", res.data.tokens.access);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Login successfull",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigate("/hr/dashboard");
+      }
+      if(loginType === 'employee'){
+        const res = await axios.post("")
+        console.log("res",res)
+      }
     } catch (error) {
       Swal.fire({
         position: "center",
@@ -68,7 +83,7 @@ export default function Login() {
       }}
     >
       <div className="h-16 left-0 w-fit me-auto ms-6">
-        <img src={logo} alt="" className="h-full"/>
+        <img src={logo} alt="" className="h-full" />
       </div>
       <div
         className="w-[85%] h-[85%] flex rounded-2xl shadow-xl"
