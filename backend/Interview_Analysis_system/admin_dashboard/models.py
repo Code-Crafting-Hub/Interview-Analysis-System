@@ -11,8 +11,17 @@ class UserManager(BaseUserManager):
             raise ValueError('The Role field must be set')
             
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password) # Handles password hashing
+        role = extra_fields['role']
+        
+        # CRITICAL FIX: Grant admin users staff status
+        is_staff = (role == User.Role.ADMIN)
+        
+        user = self.model(
+            email=email,
+            is_staff=is_staff,  # Set staff status
+            **extra_fields
+        )
+        user.set_password(password)
         user.save(using=self._db)
         return user
 

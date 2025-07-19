@@ -64,6 +64,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         role = self.context.get('role')
         user = User.objects.create_user(role=role, **validated_data)
         return user
+    
+    def validate(self, data):
+        # Prevent role modification during updates
+        if self.instance and 'role' in data and self.instance.role != data['role']:
+            raise serializers.ValidationError("Changing user roles is not allowed")
+        return data
 
 
 class LoginSerializer(serializers.Serializer):
@@ -123,6 +129,20 @@ class LogoutSerializer(serializers.Serializer):
             RefreshToken(self.token).blacklist()
         except TokenError:
             # This raises an error if the token is already invalid
+            self.fail('bad_token')
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+    default_error_messages = {'bad_token': ('Token is expired or invalid')}
+
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
             self.fail('bad_token')
 
 
