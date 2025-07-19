@@ -4,9 +4,10 @@ from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from .models import User
 
 # Import your custom serializers
-from .serializers import UserRegistrationSerializer, LoginSerializer, LogoutSerializer
+from .serializers import UserRegistrationSerializer, LoginSerializer, LogoutSerializer, EmployeeListSerializer
 
 # Import your custom permissions
 from .permissions import IsAdminUser
@@ -98,3 +99,48 @@ class LogoutAPIView(generics.GenericAPIView):
             return Response({"detail": "Token is invalid or expired."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"detail": "Logout successful."}, status=status.HTTP_204_NO_CONTENT)
+
+
+class EmployeeListView(generics.ListAPIView):
+    """
+    Protected API endpoint for an admin to view a list of all employees.
+    """
+    serializer_class = EmployeeListSerializer
+    permission_classes = [IsAdminUser] # Use the same admin-only permission
+
+    def get_queryset(self):
+        """
+        This method is overridden to ensure we only return users with the 'employee' role.
+        """
+        return User.objects.filter(role=User.Role.EMPLOYEE).order_by('full_name')
+
+
+class EmployeeViewSet(viewsets.ModelViewSet):
+    """
+    A full CRUD ViewSet for Admins to manage employees.
+    Provides list, detail, create, update, and delete functionality.
+    """
+    permission_classes = [IsAdminUser] # Protect all actions in this ViewSet
+
+    def get_queryset(self):
+        """
+        This ViewSet should only ever operate on users with the 'employee' role.
+        """
+        return User.objects.filter(role=User.Role.EMPLOYEE)
+
+    def get_serializer_class(self):
+        """
+        Use different serializers for different actions.
+        """
+        if self.action == 'list':
+            # For the list view, use the simple EmployeeListSerializer.
+            return EmployeeListSerializer
+        # For 'create', 'update', 'retrieve' actions, use the more detailed
+        # UserRegistrationSerializer which includes all fields.
+        return UserRegistrationSerializer
+
+    def get_serializer_context(self):
+        """
+        Pass the 'employee' role to the serializer when creating a new employee.
+        """
+        return {'role': 'employee'}

@@ -125,3 +125,25 @@ class LogoutSerializer(serializers.Serializer):
         except TokenError:
             # This raises an error if the token is already invalid
             self.fail('bad_token')
+
+
+class EmployeeListSerializer(serializers.ModelSerializer):
+    """
+    Serializer specifically for listing employees in the admin dashboard.
+    It exposes fields relevant for a list view.
+    """
+    # Make the department name readable in the response
+    department_name = serializers.CharField(source='department.name', read_only=True)
+
+    class Meta:
+        model = User
+        # Define the fields you want to show for each employee in the list
+        fields = [
+            'id',
+            'full_name',
+            'email',
+            'position',
+            'department_name',
+            'phone_number',
+            'employee_image'
+        ]

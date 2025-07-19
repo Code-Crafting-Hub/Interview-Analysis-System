@@ -8,12 +8,15 @@ from .views import (
     EmployeeCreateByAdminView,
     LoginAPIView,
     DepartmentViewSet,
-    LogoutAPIView
+    LogoutAPIView,
+    EmployeeListView,
+    EmployeeViewSet 
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
 router = DefaultRouter()
 router.register(r'departments', DepartmentViewSet, basename='department')
+router.register(r'admin/employees', EmployeeViewSet, basename='employee')
 
 urlpatterns = [
     path('admin/register/', AdminRegistrationView.as_view(), name='admin-register'),
@@ -24,5 +27,6 @@ urlpatterns = [
 
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('logout/', LogoutAPIView.as_view(), name='logout'),
+    path('admin/employees/', EmployeeListView.as_view(), name='employee-list'),
     path('', include(router.urls)),
 ]
