@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from employee_dashboard.models import Department 
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -20,15 +22,21 @@ class User(AbstractBaseUser):
         EMPLOYEE = "employee", "Employee"
 
     # --- SHARED FIELDS ---
-    full_name = models.CharField(max_length=255) # Replaced first_name and last_name
-    email = models.EmailField(unique=True) # The user's unique identifier
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
     role = models.CharField(max_length=50, choices=Role.choices)
-    is_active = models.BooleanField(default=True)
     
     # --- ADMIN-SPECIFIC FIELDS ---
     admin_phone = models.CharField(max_length=20, blank=True, null=True)
     admin_address = models.TextField(blank=True, null=True)
     admin_image = models.ImageField(upload_to='admin_images/', blank=True, null=True)
+
+    # --- NEW EMPLOYEE-SPECIFIC FIELDS ---
+    # We make these blank/null because they do not apply to Admins.
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    position = models.CharField(max_length=100, blank=True, null=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    employee_image = models.ImageField(upload_to='employee_images/', blank=True, null=True)
 
     objects = UserManager()
 

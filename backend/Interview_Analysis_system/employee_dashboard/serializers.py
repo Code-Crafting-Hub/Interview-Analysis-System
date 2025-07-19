@@ -1,28 +1,29 @@
+# employees_dashboard/serializers.py - REPLACED CONTENTS
+
 from rest_framework import serializers
-from .models import Department, Employee
+from .models import Department
+# Import the central User model
+from admin_dashboard.models import User 
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
         fields = ['id', 'name', 'description']
 
-class EmployeeSerializer(serializers.ModelSerializer):
-    # This makes the API response more user-friendly by including the department's name
+class EmployeeProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for an employee to view or update their own profile.
+    It reads from the central User model.
+    """
+    # Make related fields readable
     department_name = serializers.CharField(source='department.name', read_only=True)
-    
+
     class Meta:
-        model = Employee
+        model = User
+        # Only expose fields relevant to an employee's profile
         fields = [
-            'id', 
-            'first_name', 
-            'last_name', 
-            'email', 
-            'phone_number',
-            'department',       # This will be the ID for writing/updating
-            'department_name',  # This is for reading
-            'position', 
-            'date_hired', 
-            'created_by'
+            'id', 'full_name', 'email', 'phone_number', 
+            'position', 'department', 'department_name'
         ]
-        # These fields should be set by the server, not the client
-        read_only_fields = ['created_by', 'date_hired', 'department_name']
+        # An employee should not be able to change their email or role
+        read_only_fields = ['email', 'role']
