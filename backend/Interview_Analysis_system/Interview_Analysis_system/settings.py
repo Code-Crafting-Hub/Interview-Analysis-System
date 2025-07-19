@@ -47,6 +47,7 @@ EXTERNAL_APPS = [
     # 'accounts',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS

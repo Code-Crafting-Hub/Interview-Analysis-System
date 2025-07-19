@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from employee_dashboard.models import Department
+from rest_framework_simplejwt.exceptions import TokenError
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     """
@@ -74,52 +75,62 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     """
-    Handles user login and returns a SINGLE long-lived token and user details.
+    A smart serializer that handles login and validates the user's role.
     """
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
+        # Get the expected role from the context passed by the view
+        expected_role = self.context.get('expected_role')
+        
+        # First, authenticate with email and password
         user = authenticate(email=data['email'], password=data['password'])
-        if not user or not user.is_active:
-            raise serializers.ValidationError("Incorrect Credentials or user is inactive.")
 
-        # We still generate a RefreshToken object because it's the easiest
-        # way to get a correctly structured access token.
+        if not user or not user.is_active:
+            raise serializers.ValidationError("Incorrect credentials or user account is inactive.")
+
+        # --- THIS IS THE NEW ROLE CHECK ---
+        # After successful authentication, check if the user's role matches.
+        if user.role != expected_role:
+            raise serializers.ValidationError(f"Access Denied: You are not authorized to log in as an {expected_role}.")
+        
+        # If both password and role are correct, generate tokens
         refresh = RefreshToken.for_user(user)
         refresh['role'] = user.role
         refresh['full_name'] = user.full_name
 
-        # --- THIS IS THE KEY CHANGE ---
-        # We only return the 'access' part of the token.
         return {
-            'token': str(refresh.access_token), # Renamed to 'token' for clarity
+            'tokens': {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            },
             'user_details': {
                 'id': user.id,
                 'full_name': user.full_name,
                 'email': user.email,
                 'role': user.role,
             }
-        }
+        }    
 
-class LogoutSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
+# class LogoutSerializer(serializers.Serializer):
+#     refresh = serializers.CharField()
 
-    default_error_messages = {
-        'bad_token': ('Token is expired or invalid')
-    }
+#     default_error_messages = {
+#         'bad_token': ('Token is expired or invalid')
+#     }
 
-    def validate(self, attrs):
-        self.token = attrs['refresh']
-        return attrs
+#     def validate(self, attrs):
+#         self.token = attrs['refresh']
+#         return attrs
 
-    def save(self, **kwargs):
-        try:
-            # This is the line that does the actual work
-            RefreshToken(self.token).blacklist()
-        except TokenError:
-            # This raises an error if the token is already invalid
-            self.fail('bad_token')
+#     def save(self, **kwargs):
+#         try:
+#             # This is the line that does the actual work
+#             RefreshToken(self.token).blacklist()
+#         except TokenError:
+#             # This raises an error if the token is already invalid
+#             self.fail('bad_token')
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
@@ -131,7 +142,8 @@ class LogoutSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         try:
-            RefreshToken(self.token).blacklist()
+            token =RefreshToken(self.token)
+            token.blacklist()
         except TokenError:
             self.fail('bad_token')
 
