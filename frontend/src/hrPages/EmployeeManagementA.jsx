@@ -51,7 +51,7 @@ export default function EmployeeManagementA() {
         <Navbar name="Employee Management" />
 
         {/* Employee List */}
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {employees.map((emp) => (
             <div key={emp.id} className="bg-white rounded-lg shadow p-4 space-y-2">
               <img
@@ -64,7 +64,7 @@ export default function EmployeeManagementA() {
               <p className="text-center text-sm">{emp.position} - {emp.department}</p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Add Employee Button */}
         <div className="fixed right-6 w-fit bottom-6">
