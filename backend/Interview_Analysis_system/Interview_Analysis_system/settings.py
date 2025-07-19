@@ -39,6 +39,18 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
+EXTERNAL_APPS = [
+    'rest_framework',
+    'corsheaders',
+    'admin_dashboard',
+    'employee_dashboard',
+    # 'accounts',
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+]
+
+INSTALLED_APPS += EXTERNAL_APPS
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -99,6 +111,17 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
+
+AUTHENTICATION_BACKENDS = [
+    'admin_dashboard.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -120,3 +143,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+APPEND_SLASH = True
