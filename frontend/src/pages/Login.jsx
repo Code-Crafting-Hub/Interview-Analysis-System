@@ -40,12 +40,13 @@ export default function Login() {
         });
         return;
       }
-      const res = await axios.post("", data, {
+      const res = await axios.post("http://127.0.0.1:8000/api/login/", data, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
         },
       });
+      console.log("res:",res)
     } catch (error) {
       Swal.fire({
         position: "center",
