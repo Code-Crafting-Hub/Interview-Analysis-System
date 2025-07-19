@@ -74,43 +74,33 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     """
-    A smart serializer that handles login and validates the user's role.
+    Handles user login and returns a SINGLE long-lived token and user details.
     """
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        # Get the expected role from the context passed by the view
-        expected_role = self.context.get('expected_role')
-        
-        # First, authenticate with email and password
         user = authenticate(email=data['email'], password=data['password'])
-
         if not user or not user.is_active:
-            raise serializers.ValidationError("Incorrect credentials or user account is inactive.")
+            raise serializers.ValidationError("Incorrect Credentials or user is inactive.")
 
-        # --- THIS IS THE NEW ROLE CHECK ---
-        # After successful authentication, check if the user's role matches.
-        if user.role != expected_role:
-            raise serializers.ValidationError(f"Access Denied: You are not authorized to log in as an {expected_role}.")
-        
-        # If both password and role are correct, generate tokens
+        # We still generate a RefreshToken object because it's the easiest
+        # way to get a correctly structured access token.
         refresh = RefreshToken.for_user(user)
         refresh['role'] = user.role
         refresh['full_name'] = user.full_name
 
+        # --- THIS IS THE KEY CHANGE ---
+        # We only return the 'access' part of the token.
         return {
-            'tokens': {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            },
+            'token': str(refresh.access_token), # Renamed to 'token' for clarity
             'user_details': {
                 'id': user.id,
                 'full_name': user.full_name,
                 'email': user.email,
                 'role': user.role,
             }
-        }    
+        }
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
