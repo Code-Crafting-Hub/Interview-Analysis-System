@@ -50,23 +50,37 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
         return {'role': 'employee'}
 
 
-class LoginAPIView(APIView):
+class AdminLoginAPIView(generics.GenericAPIView):
     """
-    Public API endpoint for any user (Admin or Employee) to log in.
-    Uses our custom LoginSerializer to handle authentication and token generation.
+    API endpoint for Admin login.
     """
     permission_classes = [permissions.AllowAny]
     serializer_class = LoginSerializer
 
-    def post(self, request):
-        """
-        Handles the POST request for logging in.
-        """
-        serializer = self.serializer_class(data=request.data)
+    def get_serializer_context(self):
+        # Pass the 'expected_role' to the serializer
+        return {'expected_role': 'admin'}
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        # The serializer's .validate() method returns the tokens and user details.
-        # We return this data in the response.
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
+class EmployeeLoginAPIView(generics.GenericAPIView):
+    """
+    API endpoint for Employee login.
+    """
+    permission_classes = [permissions.AllowAny]
+    serializer_class = LoginSerializer
+
+    def get_serializer_context(self):
+        # Pass the 'expected_role' to the serializer
+        return {'expected_role': 'employee'}
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
