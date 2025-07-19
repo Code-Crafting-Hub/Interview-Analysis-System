@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import { SlCalender } from "react-icons/sl";
 import { RiTeamLine } from "react-icons/ri";
@@ -10,11 +10,49 @@ import { BsGraphUpArrow } from "react-icons/bs";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
-import logo from '../assets/logo2.png'
+import logo from "../assets/logo2.png";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const bgColor = "#0D3D66";
+  const navigate= useNavigate()
+
+  const back_Url = import.meta.env.VITE_BACKEND_URL
+
+  const logoutHandler = async () => {
+    const refreshToken = localStorage.getItem("rtoken");
+    try {
+      await axios.post(
+      `${back_Url}admin/logout/`,
+      { refresh: refreshToken },
+      {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+        },
+      }
+    );
+      localStorage.removeItem("atoken")
+      localStorage.removeItem("rtoken")
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Logout successfully",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      navigate("/")
+    } catch (error) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "error in logout",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
 
   return (
     <>
@@ -34,43 +72,67 @@ export default function Sidebar() {
         style={{ backgroundColor: bgColor }}
       >
         <h1 className="border-b-2 text-center text-xl font-semibold py-1 px-2">
-          <img src={logo} alt=""  className="h-[70px] mx-auto"/>
+          <img src={logo} alt="" className="h-[70px] mx-auto" />
         </h1>
         <nav className="flex flex-col p-4 space-y-4 h-[72%]">
-          <Link to="/hr/dashboard" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/dashboard"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <RxDashboard />
             Dashboard
           </Link>
-          <Link to="/hr/employee-management" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/employee-management"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <AiOutlineTeam />
             Employee Management
           </Link>
-          <Link to="/hr/leave-management" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/leave-management"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <SlCalender />
             Leave Management
           </Link>
-          <Link to="/hr/payroll" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/payroll"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <RiMoneyRupeeCircleLine />
             Payroll
           </Link>
-          <Link to="/hr/team-allocation" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/team-allocation"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <RiTeamLine />
             Team Allocation
           </Link>
-          <Link to="/hr/performance-report" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/performance-report"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <BsGraphUpArrow />
             Performance Report
           </Link>
         </nav>
         <footer className="border-t-2 p-4 flex flex-col items-baseline">
-          <Link to="/hr/settings" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/settings"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <IoSettingsOutline />
             Settings
           </Link>
-          <Link className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <button
+            onClick={logoutHandler}
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <IoIosLogOut />
             Logout
-          </Link>
+          </button>
         </footer>
       </div>
     </>

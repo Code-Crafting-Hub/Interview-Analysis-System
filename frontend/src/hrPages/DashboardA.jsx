@@ -5,6 +5,7 @@ import Navbar from "./Navbar";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { refreshAccessToken } from "../utils/tokenUtils.js";
 
 export default function DashboardA() {
   const [full_name, setFullname] = React.useState("");
@@ -16,16 +17,27 @@ export default function DashboardA() {
   const [employeeForm, setEmployeeForm] = React.useState(false);
   const [employees, setEmployees] = React.useState([]);
   const navigate = useNavigate();
-  const token = localStorage.getItem("atoken");
+  const accessToken = localStorage.getItem("atoken");
 
   const back_url = import.meta.env.VITE_BACKEND_URL;
 
-  if (!token) {
-    navigate("/");
-  }
+  const adminVerify = () => {
+    if (!accessToken) {
+      navigate("/");
+    }
+  };
+
+  React.useEffect(()=>{adminVerify()},[])
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+      formData.append("full_name", full_name);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("position", position);
+      formData.append("department", department);
+      formData.append("image", image);
     if (
       !full_name ||
       !email ||
@@ -43,21 +55,24 @@ export default function DashboardA() {
       });
       return;
     }
+    console.log(formData)
 
     try {
-      const formData = new FormData();
-      formData.append("full_name", full_name);
-      formData.append("email", email);
-      formData.append("password", password);
-      formData.append("position", position);
-      formData.append("department", department);
-      formData.append("employee_image", image);
-      const res = await axios.post(`${back_url}admin/create-employee/`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      let accessToken = localStorage.getItem("atoken");
+    const newAccessToken = await refreshAccessToken(); // refreshAccessToken internally checks expiry
+    if (newAccessToken) {
+      accessToken = newAccessToken;
+    }
+      const res = await axios.post(
+        `${back_url}admin/create-employee/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       console.log("res: ", res);
       Swal.fire({
         position: "center",
@@ -75,16 +90,29 @@ export default function DashboardA() {
       setEmployeeForm(false);
       navigate("/hr/dashboard");
     } catch (error) {
-      console.error("Create employee failed:", error.response || error.message);
+    // Check if token expired
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.code === "token_not_valid"
+    ) {
+      const newToken = await refreshAccessToken();
+      if (newToken) {
+        return handleAddEmployee(e);
+      } else {
+        Swal.fire({ icon: "error", title: "Session expired", timer: 1500 });
+        navigate("/");
+      }
+    } else {
       Swal.fire({
-        position: "center",
         icon: "error",
-        title: "Fill details properly",
-        showConfirmButton: false,
+        title: "Failed to create employee",
         timer: 1500,
       });
+      console.error("Create employee failed:", error.response || error.message);
     }
-  };
+  }
+};
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
@@ -188,7 +216,6 @@ export default function DashboardA() {
                 />
                 <input
                   type="file"
-                  accept="image/*"
                   onChange={handleImageChange}
                   required
                   className="w-full border px-4 py-2 rounded outline-none"

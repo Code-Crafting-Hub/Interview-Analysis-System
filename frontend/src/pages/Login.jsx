@@ -52,6 +52,7 @@ export default function Login() {
           },
         });
         localStorage.setItem("atoken", res.data.tokens.access);
+        localStorage.setItem("rtoken", res.data.tokens.refresh);
         Swal.fire({
           position: "center",
           icon: "success",
