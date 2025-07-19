@@ -12,4 +12,5 @@ class EmployeeProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         # This method ensures that users can only ever see their own data
+
         return self.request.user
