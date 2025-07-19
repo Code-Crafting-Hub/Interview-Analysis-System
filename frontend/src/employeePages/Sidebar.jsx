@@ -32,17 +32,14 @@ export default function Sidebar() {
       }
 
       const response = await axios.post(`${back_url}employee/logout/`, {
-        method: "POST",
-        headers: {
+         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${access}`,
         },
-        body: JSON.stringify({ refresh }),
       });
 
       if (response.ok) {
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
+        localStorage.removeItem("token");
         Swal.fire({
           icon: "success",
           title: "Logged out successfully",
@@ -54,11 +51,21 @@ export default function Sidebar() {
       } else {
         const data = await response.json();
         console.error("Logout failed:", data);
-        Swal.fire("Logout Failed", data.detail || "Something went wrong.", "error");
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+          showConfirmButton: false,
+          timer: 1500,
+        })
       }
     } catch (error) {
       console.error("Logout error:", error);
-      Swal.fire("Error", "Something went wrong while logging out.", "error");
+      Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+          showConfirmButton: false,
+          timer: 1500,
+        })
     }
   };
 

@@ -7,24 +7,11 @@ import Swal from "sweetalert2";
 
 export default function ProfileE() {
   const [data, setData] = React.useState([]);
-  
-    React.useEffect(() => {
-      const mockData = [
-        {
-          id: "1",
-          name: "Yashkaran Singh",
-          image: "https://via.placeholder.com/100",
-          email: "yash@example.com",
-          phoneNo: "1234567890",
-          address: "Morinda, Punjab",
-        },
-      ];
-      setData(mockData);
-    }, []);
+  const back_url = import.meta.env.VITE_BACKEND_URL
   
     const profileHandler = async () => {
       try {
-        const res = await axios.get("https://your-api.com/users");
+        const res = await axios.get(`${back_url}admin/employee/`);
         setData(res.data);
         console.log(res.data);
       } catch (error) {
