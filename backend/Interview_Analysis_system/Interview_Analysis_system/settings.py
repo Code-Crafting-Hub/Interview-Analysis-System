@@ -47,7 +47,7 @@ EXTERNAL_APPS = [
     # 'accounts',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
-    'rest_framework_simplejwt.token_blacklist',
+    # 'rest_framework_simplejwt.token_blacklist',
 ]
 
 INSTALLED_APPS += EXTERNAL_APPS
@@ -148,6 +148,11 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+# Interview_Analysis_system/settings.py
+
+# This line tells Django and all its apps to use your User model
+# for everything related to authentication.
 
 
 # Static files (CSS, JavaScript, Images)
