@@ -36,7 +36,7 @@ export default function Navbar({ name }) {
             {profile && (
               <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg overflow-hidden z-50 animate-fadeIn">
                 <Link
-                  to="/hr"
+                  to="/employee"
                   className="block px-4 py-2 hover:bg-gray-100 transition"
                 >
                   Profile

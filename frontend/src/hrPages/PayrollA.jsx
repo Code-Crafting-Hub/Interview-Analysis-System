@@ -5,9 +5,16 @@ import Navbar from "./Navbar";
 
 export default function PayrollA() {
   return (
-    <div className="flex">
+    <div className="static md:flex">
       <Sidebar />
-      <Navbar name="Payroll" />
+      <div className="flex flex-col w-full">
+        <div className="lg:hidden border-b-2 p-5">
+          <p className="text-3xl font-semibold text-[#0D3D66]">Payroll</p>
+        </div>
+        <Navbar name="Payroll" />
+        {/* Section div */}
+        <div></div>
+      </div>
     </div>
   );
 }

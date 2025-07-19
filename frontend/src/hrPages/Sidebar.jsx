@@ -19,7 +19,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <div className="md:hidden flex items-center justify-between p-4 bg-white shadow-lg">
+      <div className="md:hidden flex w-full items-center justify-between p-4 bg-white shadow-lg">
         <h1 className="text-xl font-semibold">HR Dashboard</h1>
         <button onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <FaTimes size={22} /> : <FaBars size={22} />}

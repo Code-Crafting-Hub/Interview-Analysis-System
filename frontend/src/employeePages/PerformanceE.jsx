@@ -3,7 +3,7 @@ import React from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
-export default function PerformanceA() {
+export default function PerformanceE() {
   return (
     <div className="static md:flex">
       <Sidebar />

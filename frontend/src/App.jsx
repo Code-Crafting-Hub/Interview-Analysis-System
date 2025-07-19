@@ -12,6 +12,8 @@ import PayrollA from './hrPages/PayrollA'
 import PerformanceA from './hrPages/PerformanceA'
 import SettingsA from './hrPages/SettingsA'
 import TeamAllocationA from './hrPages/TeamAllocationA'
+import Downloads from './employeePages/Downloads'
+import PerformanceE from './employeePages/PerformanceE'
 
 function App() {
 
@@ -20,7 +22,12 @@ function App() {
     <Routes>
       {/* <Route path='/' element={<Home/>}/> */}
       <Route path='/' element={<Login/>}/>
+
+
+      {/* Employee Routes */}
       <Route path='/employee' element={<ProfileE/>}/>
+      <Route path='/downloads' element={<Downloads/>}/>
+      <Route path='/performance' element={<PerformanceE/>}/>
 
 
       {/* Hr routes */}

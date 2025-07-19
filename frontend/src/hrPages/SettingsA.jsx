@@ -5,9 +5,16 @@ import Navbar from "./Navbar";
 
 export default function SettingsA() {
   return (
-    <div className="flex">
-      <Sidebar />
-      <Navbar name="Settings" />
-    </div>
+    <div className="static md:flex">
+          <Sidebar />
+          <div className="flex flex-col w-full">
+            <div className="lg:hidden border-b-2 p-5">
+              <p className="text-3xl font-semibold text-[#0D3D66]">Settings</p>
+            </div>
+            <Navbar name="Settings" />
+            {/* Section div */}
+            <div></div>
+          </div>
+        </div>
   );
 }

@@ -20,6 +20,8 @@ export default function Login() {
   const [pass, setPass] = React.useState("password");
   const navigate = useNavigate("/hr/dashboard");
 
+  const backUrl = import.meta.env.VITE_BACKEND_URL
+
   const passViewHandler = () => {
     setPassview((prev) => {
       const newState = !prev;
@@ -43,7 +45,7 @@ export default function Login() {
         return;
       }
       if (loginType === "admin") {
-        const res = await axios.post("http://127.0.0.1:8000/api/login/", data, {
+        const res = await axios.post(`${backUrl}login/`, data, {
           headers: {
             "Content-Type": "application/json",
           },
