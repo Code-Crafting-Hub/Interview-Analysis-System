@@ -1,21 +1,66 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { RxDashboard } from "react-icons/rx";
-import { SlCalender } from "react-icons/sl";
-import { RiTeamLine } from "react-icons/ri";
-import { AiOutlineTeam } from "react-icons/ai";
+import { Link, useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import { BsGraphUpArrow } from "react-icons/bs";
-import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { IoIosLogOut } from "react-icons/io";
-import logo from '../assets/logo2.png'
+import logo from "../assets/logo2.png";
 import { PiDownloadSimple } from "react-icons/pi";
+import Swal from "sweetalert2";
+import axios from "axios";
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const bgColor = "#0D3D66";
+
+  const back_url = import.meta.env.VITE_BACKEND_URL
+
+  const logoutHandler = async () => {
+    try {
+      const access = localStorage.getItem("token");
+
+      if (!access) {
+         Swal.fire({
+          icon: "error",
+          title: "User not login",
+          showConfirmButton: false,
+          timer: 1500,
+        })
+        return;
+      }
+
+      const response = await axios.post(`${back_url}employee/logout/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access}`,
+        },
+        body: JSON.stringify({ refresh }),
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        Swal.fire({
+          icon: "success",
+          title: "Logged out successfully",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          navigate("/login");
+        });
+      } else {
+        const data = await response.json();
+        console.error("Logout failed:", data);
+        Swal.fire("Logout Failed", data.detail || "Something went wrong.", "error");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      Swal.fire("Error", "Something went wrong while logging out.", "error");
+    }
+  };
 
   return (
     <>
@@ -35,27 +80,39 @@ export default function Sidebar() {
         style={{ backgroundColor: bgColor }}
       >
         <h1 className="border-b-2 text-center text-xl font-semibold py-1 px-2">
-          <img src={logo} alt=""  className="h-[70px] mx-auto"/>
+          <img src={logo} alt="Logo" className="h-[70px] mx-auto" />
         </h1>
         <nav className="flex flex-col p-4 space-y-4 h-[72%]">
-          <Link to="/performance" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/performance"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <BsGraphUpArrow />
             Performance Report
           </Link>
-          <Link to="/downloads" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/downloads"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <PiDownloadSimple />
             Downloads
           </Link>
         </nav>
         <footer className="border-t-2 p-4 flex flex-col items-baseline">
-          <Link to="/hr/settings" className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <Link
+            to="/hr/settings"
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <IoSettingsOutline />
             Settings
           </Link>
-          <Link className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5">
+          <button
+            onClick={logoutHandler}
+            className="w-full py-3 px-2 rounded-md hover:bg-white/20 flex items-center gap-1.5"
+          >
             <IoIosLogOut />
             Logout
-          </Link>
+          </button>
         </footer>
       </div>
     </>

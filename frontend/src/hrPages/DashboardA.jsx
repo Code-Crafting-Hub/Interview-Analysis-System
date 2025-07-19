@@ -55,7 +55,6 @@ export default function DashboardA() {
       });
       return;
     }
-    console.log(formData)
 
     try {
       let accessToken = localStorage.getItem("atoken");
@@ -67,13 +66,12 @@ export default function DashboardA() {
         `${back_url}admin/create-employee/`,
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
+          headers:{
             Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-      console.log("res: ", res);
       Swal.fire({
         position: "center",
         icon: "success",
@@ -109,7 +107,6 @@ export default function DashboardA() {
         title: "Failed to create employee",
         timer: 1500,
       });
-      console.error("Create employee failed:", error.response || error.message);
     }
   }
 };

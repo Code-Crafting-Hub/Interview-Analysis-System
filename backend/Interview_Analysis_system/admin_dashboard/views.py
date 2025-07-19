@@ -98,6 +98,33 @@ class DepartmentViewSet(viewsets.ModelViewSet):
 class LogoutAPIView(generics.GenericAPIView):
     """
     API endpoint for user logout. Blacklists the refresh token.
+    This endpoint requires the user to be authenticated.
+    """
+    serializer_class = LogoutSerializer
+    
+    # --- THIS IS THE FIX ---
+    # The user must be logged in (i.e., provide a valid access token)
+    # to be able to log out.
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        """
+        Handles the POST request to log a user out.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            serializer.save()
+        except TokenError:
+            # This can happen if the refresh token is already invalid.
+            # We can still consider the logout successful on the client side.
+            return Response({"detail": "Token is invalid or expired."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # A 204 No Content response is standard for a successful delete/logout action.
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    """
+    API endpoint for user logout. Blacklists the refresh token.
     """
     serializer_class = LogoutSerializer
     permission_classes = [permissions.AllowAny]
