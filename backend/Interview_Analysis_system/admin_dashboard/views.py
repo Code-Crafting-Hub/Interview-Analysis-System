@@ -29,9 +29,20 @@ class AdminRegistrationView(generics.CreateAPIView):
     def get_serializer_context(self):
         return {'role': 'admin'}
 
+from .permissions import IsAdminUser
+from .serializers import UserRegistrationSerializer
+
 class EmployeeCreateByAdminView(generics.CreateAPIView):
+    """
+    This is the protected API endpoint for an Admin to create a new Employee.
+    """
     serializer_class = UserRegistrationSerializer
+    
+    # THIS IS THE SECURITY LOCK:
+    # This line tells Django Rest Framework to use our custom permission.
+    # Any request to this view will first be checked by IsAdminUser.
     permission_classes = [IsAdminUser] 
     
     def get_serializer_context(self):
+        # This tells our dynamic serializer to prepare for an 'employee'.
         return {'role': 'employee'}

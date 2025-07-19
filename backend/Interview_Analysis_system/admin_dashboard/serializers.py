@@ -7,27 +7,35 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # --- NEW, SIMPLIFIED LOGIN SERIALIZER ---
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+    """
+    Handles user login and returns a clean JSON response with ONLY the tokens.
+    """
+    # --- THIS IS THE FIX ---
+    # We mark 'email' as write_only so it is used for input validation
+    # but NOT for creating the output response.
+    email = serializers.EmailField(write_only=True)
+    
+    password = serializers.CharField(
+        style={'input_type': 'password'},
+        write_only=True
+    )
 
     def validate(self, data):
-        # We manually authenticate the user.
-        # We use a custom authentication backend that we will define in settings.py
+        # Use our custom email backend to authenticate the user
         user = authenticate(email=data['email'], password=data['password'])
         
-        if user and user.is_active:
-            # If authentication is successful, create JWT tokens
-            refresh = RefreshToken.for_user(user)
-            
-            return {
-                'email': user.email,
-                'tokens': {
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                }
-            }
-        
-        raise serializers.ValidationError("Incorrect Credentials")
+        if not user or not user.is_active:
+            raise serializers.ValidationError("Incorrect credentials or user account is inactive.")
+
+        # If authentication is successful, generate the tokens.
+        refresh = RefreshToken.for_user(user)
+
+        # Return a dictionary containing ONLY the tokens.
+        # Since 'email' is now write_only, the serializer will not look for it here.
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
 
 
 # --- THIS REGISTRATION SERIALIZER STAYS THE SAME ---
