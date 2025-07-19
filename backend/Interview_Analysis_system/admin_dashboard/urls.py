@@ -1,13 +1,19 @@
 # admin_dashboard/urls.py
 
-from django.urls import path
+from django.urls import path,include
+from rest_framework.routers import DefaultRouter
 # Import our new LoginAPIView
 from .views import (
     AdminRegistrationView,
     EmployeeCreateByAdminView,
-    LoginAPIView, 
+    LoginAPIView,
+    DepartmentViewSet,
+    LogoutAPIView
 )
 from rest_framework_simplejwt.views import TokenRefreshView
+
+router = DefaultRouter()
+router.register(r'departments', DepartmentViewSet, basename='department')
 
 urlpatterns = [
     path('admin/register/', AdminRegistrationView.as_view(), name='admin-register'),
@@ -17,4 +23,6 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
 
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('logout/', LogoutAPIView.as_view(), name='logout'),
+    path('', include(router.urls)),
 ]
