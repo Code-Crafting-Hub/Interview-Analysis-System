@@ -15,3 +15,11 @@ Build an internal web dashboard for HR teams of a company to track employee onbo
 
 <img width="1919" height="913" alt="Screenshot 2025-07-20 114301" src="https://github.com/user-attachments/assets/4ec7de56-dd1b-4076-92e5-fb0c1823d741" />
 <img width="1919" height="906" alt="Screenshot 2025-07-20 114330" src="https://github.com/user-attachments/assets/17aa545d-96d6-43b0-927c-e7fc564b5a3a" />
+
+# Employee Profile Settings
+<img width="1915" height="912" alt="image" src="https://github.com/user-attachments/assets/f8732fcd-88f0-42ab-92a1-a2b26e17ee11" />
+
+
+# Admin Profile Settings
+
+<img width="1919" height="913" alt="image" src="https://github.com/user-attachments/assets/b7588927-9433-4651-bc36-f1b2d482c087" />
