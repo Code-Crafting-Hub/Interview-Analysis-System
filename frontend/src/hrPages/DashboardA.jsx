@@ -39,9 +39,7 @@ export default function DashboardA() {
     formData.append("password", password);
     formData.append("position", position);
     formData.append("image", image);
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
+   
     if (
       !full_name ||
       !email ||
