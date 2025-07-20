@@ -1,7 +1,7 @@
 # Interview-Analysis-System
 Build an internal web dashboard for HR teams of a company to track employee onboarding, leaves, salary slips, team allocation, and performance reports. Include secure admin panel access and employee login. Generate downloadable reports and auto-alerts.
 
-#HR Login
+# HR Login
 <img width="1913" height="908" alt="Screenshot 2025-07-19 191848" src="https://github.com/user-attachments/assets/bbfbbca0-3893-4655-bcc6-a8bac5489477" />
 <img width="1912" height="912" alt="Screenshot 2025-07-20 111956" src="https://github.com/user-attachments/assets/148148bc-963d-4b12-aa3b-56ae5bd09e84" />
 <img width="1919" height="926" alt="Screenshot 2025-07-20 112908" src="https://github.com/user-attachments/assets/69b89f80-83f1-4a5b-95ac-5cc4e0384bf7" />
