@@ -30,7 +30,6 @@ export default function Sidebar() {
       { refresh: refreshToken },
       {
         headers: {
-          Authorization: `Bearer ${accesToken}`,
           "Content-Type":"application/json"
         },
       }
