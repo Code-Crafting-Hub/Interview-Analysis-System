@@ -33,12 +33,16 @@ export default function DashboardA() {
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("full_name", full_name);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("position", position);
-    formData.append("image", image);
+
+    const formData = {
+      full_name,email,password,position,image
+    }
+    // const formData = new FormData();
+    // formData.append("full_name", full_name);
+    // formData.append("email", email);
+    // formData.append("password", password);
+    // formData.append("position", position);
+    // formData.append("image", image);
    
     if (
       !full_name ||
@@ -64,7 +68,8 @@ export default function DashboardA() {
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "multipart/form-data",
+            // "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
