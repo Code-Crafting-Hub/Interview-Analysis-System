@@ -105,52 +105,73 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
 
 
 
-class LogoutAPIView(generics.GenericAPIView):
-    """
-    API endpoint for user logout. Blacklists the refresh token.
-    This endpoint requires the user to be authenticated.
-    """
-    serializer_class = LogoutSerializer
+# class LogoutAPIView(generics.GenericAPIView):
+#     """
+#     API endpoint for user logout. Blacklists the refresh token.
+#     This endpoint requires the user to be authenticated.
+#     """
+#     serializer_class = LogoutSerializer
     
-    # --- THIS IS THE FIX ---
-    # The user must be logged in (i.e., provide a valid access token)
-    # to be able to log out.
-    permission_classes = [permissions.IsAuthenticated]
+#     # --- THIS IS THE FIX ---
+#     # The user must be logged in (i.e., provide a valid access token)
+#     # to be able to log out.
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def post(self, request):
+#         """
+#         Handles the POST request to log a user out.
+#         """
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         try:
+#             serializer.save()
+#         except TokenError:
+#             # This can happen if the refresh token is already invalid.
+#             # We can still consider the logout successful on the client side.
+#             return Response({"detail": "Token is invalid or expired."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # A 204 No Content response is standard for a successful delete/logout action.
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+#     """
+#     API endpoint for user logout. Blacklists the refresh token.
+#     """
+#     serializer_class = LogoutSerializer
+#     permission_classes = [permissions.AllowAny]
+
+#     def post(self, request):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         try:
+#             serializer.save()
+#         # Because we imported it, Python now knows what TokenError is.
+#         except TokenError:
+#             return Response({"detail": "Token is invalid or expired."}, status=status.HTTP_400_BAD_REQUEST)
+
+#         return Response({"detail": "Logout successful."}, status=status.HTTP_204_NO_CONTENT)
+
+
+class LogoutAPIView(APIView):
+    """
+    API endpoint for any user to logout. Blacklists the refresh token.
+    Inherits from the simpler APIView to avoid queryset requirements.
+    """
+    permission_classes = [permissions.IsAuthenticated] # User must be logged in to log out
 
     def post(self, request):
         """
         Handles the POST request to log a user out.
         """
-        serializer = self.get_serializer(data=request.data)
+        # We manually instantiate the serializer with the request data
+        serializer = LogoutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        
+        # The .save() method in our LogoutSerializer handles the blacklisting
+        serializer.save()
 
-        try:
-            serializer.save()
-        except TokenError:
-            # This can happen if the refresh token is already invalid.
-            # We can still consider the logout successful on the client side.
-            return Response({"detail": "Token is invalid or expired."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # A 204 No Content response is standard for a successful delete/logout action.
+        # Return a success response
         return Response(status=status.HTTP_204_NO_CONTENT)
-    """
-    API endpoint for user logout. Blacklists the refresh token.
-    """
-    serializer_class = LogoutSerializer
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        try:
-            serializer.save()
-        # Because we imported it, Python now knows what TokenError is.
-        except TokenError:
-            return Response({"detail": "Token is invalid or expired."}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({"detail": "Logout successful."}, status=status.HTTP_204_NO_CONTENT)
-
 
 class EmployeeListView(generics.ListAPIView):
     """
@@ -285,12 +306,12 @@ class EmployeeLoginAPIView(TokenObtainPairView):
         # This tells the login serializer to only accept users with the 'employee' role.
         return {'expected_role': 'employee'}
 
-class LogoutAPIView(generics.GenericAPIView):
-    serializer_class = LogoutSerializer
-    permission_classes = [permissions.AllowAny]
+# class LogoutAPIView(generics.GenericAPIView):
+#     serializer_class = LogoutSerializer
+#     permission_classes = [permissions.AllowAny]
 
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"detail": "Logout successful."}, status=status.HTTP_200_OK)
+#     def post(self, request):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"detail": "Logout successful."}, status=status.HTTP_200_OK)
