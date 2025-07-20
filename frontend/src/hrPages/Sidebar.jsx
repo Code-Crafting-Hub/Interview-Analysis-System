@@ -22,14 +22,16 @@ export default function Sidebar() {
   const back_Url = import.meta.env.VITE_BACKEND_URL
 
   const logoutHandler = async () => {
-    const refreshToken = localStorage.getItem("atoken");
+    const refreshToken = localStorage.getItem("rtoken");
+    const accesToken = localStorage.getItem("atoken")
     try {
       await axios.post(
       `${back_Url}admin/logout/`,
       { refresh: refreshToken },
       {
         headers: {
-          Authorization: `Bearer ${refreshToken}`,
+          Authorization: `Bearer ${accesToken}`,
+          "Content-Type":"application/json"
         },
       }
     );
