@@ -6,14 +6,14 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 // import { refreshAccessToken } from "../utils/tokenUtils.js";
-import image from '../assets/download.jpeg'
+import image from "../assets/download.jpeg";
 
 export default function DashboardA() {
   const [full_name, setFullname] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [position, setPosition] = React.useState("");
-  const [department, setDepartment] = React.useState("");
+  const [department, setDepartment] = React.useState();
   const [image, setImage] = React.useState("");
   const [employeeForm, setEmployeeForm] = React.useState(false);
   const [employees, setEmployees] = React.useState([]);
@@ -28,17 +28,22 @@ export default function DashboardA() {
     }
   };
 
-  React.useEffect(()=>{adminVerify()},[])
+  React.useEffect(() => {
+    adminVerify();
+  }, []);
 
   const handleAddEmployee = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-      formData.append("full_name", full_name);
-      formData.append("email", email);
-      formData.append("password", password);
-      formData.append("position", position);
-      formData.append("department", department);
-      formData.append("image", image);
+    formData.append("full_name", full_name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("position", position);
+    formData.append("department", department);
+    formData.append("image", image);
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
     if (
       !full_name ||
       !email ||
@@ -62,7 +67,7 @@ export default function DashboardA() {
         `${back_url}admin/create-employee/`,
         formData,
         {
-          headers:{
+          headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "multipart/form-data",
           },
@@ -84,28 +89,19 @@ export default function DashboardA() {
       setEmployeeForm(false);
       navigate("/hr/dashboard");
     } catch (error) {
-    // Check if token expired
-    if (
-      error.response &&
-      error.response.data &&
-      error.response.data.code === "token_not_valid"
-    ) {
-      const newToken = await refreshAccessToken();
-      if (newToken) {
-        return handleAddEmployee(e);
-      } else {
-        Swal.fire({ icon: "error", title: "Session expired", timer: 1500 });
-        navigate("/");
-      }
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Failed to create employee",
-        timer: 1500,
-      });
-    }
+      console.log("error:", error)
+      // Check if token expired
+      if (error.response) {
+    console.log(error.response.data);   // Backend error detail
+    console.log(error.response.status); // 400
+    console.log(error.response.headers);
+  } else if (error.request) {
+    console.log(error.request);
+  } else {
+    console.log('Error', error.message);
   }
-};
+    }
+  };
 
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
@@ -142,31 +138,71 @@ export default function DashboardA() {
             </div>
           ))}
         </div> */}
-        <div className="border-b-[#0D3D66] m-8"><p className="text-4xl font-bold text-[#0D3D66] w-full border-b pb-5">Information</p></div>
+        <div className="border-b-[#0D3D66] m-8">
+          <p className="text-4xl font-bold text-[#0D3D66] w-full border-b pb-5">
+            Information
+          </p>
+        </div>
         <div className="flex justify-center items-center gap-10">
           <div className="shadow-xl p-8 rounded-md">
-            <h3 className="font-semibold text-[#0D3D66] text-3xl border-b-[#0D3D66] w-full mb-4">IT Deparment</h3>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Total workers:</strong>50</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Present: </strong>30</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Leave:</strong> 15</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Absent: </strong>5</p>
-            <button className="py-2 px-6 bg-[#0D3D66] text-white rounded-full hover:cursor-pointer hover:bg-blue-950 mt-5 w-full">See full detail</button>
+            <h3 className="font-semibold text-[#0D3D66] text-3xl border-b-[#0D3D66] w-full mb-4">
+              IT Deparment
+            </h3>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Total workers:</strong>50
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Present: </strong>30
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Leave:</strong> 15
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Absent: </strong>5
+            </p>
+            <button className="py-2 px-6 bg-[#0D3D66] text-white rounded-full hover:cursor-pointer hover:bg-blue-950 mt-5 w-full">
+              See full detail
+            </button>
           </div>
           <div className="shadow-xl p-8 rounded-md">
-            <h3 className="font-semibold text-[#0D3D66] text-3xl border-b-[#0D3D66] w-full mb-4">Accounts Deparment</h3>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Total workers:</strong>30</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Present: </strong>20</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Leave:</strong> 5</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Absent: </strong>5</p>
-            <button className="py-2 px-6 bg-[#0D3D66] text-white rounded-full hover:cursor-pointer hover:bg-blue-950 mt-5 w-full">See full detail</button>
+            <h3 className="font-semibold text-[#0D3D66] text-3xl border-b-[#0D3D66] w-full mb-4">
+              Accounts Deparment
+            </h3>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Total workers:</strong>30
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Present: </strong>20
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Leave:</strong> 5
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Absent: </strong>5
+            </p>
+            <button className="py-2 px-6 bg-[#0D3D66] text-white rounded-full hover:cursor-pointer hover:bg-blue-950 mt-5 w-full">
+              See full detail
+            </button>
           </div>
           <div className="shadow-xl p-8 rounded-md">
-            <h3 className="font-semibold text-[#0D3D66] text-3xl border-b-[#0D3D66] w-full mb-4">Marketing Deparment</h3>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Total workers:</strong>70</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Present: </strong>50</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Leave:</strong> 15</p>
-            <p className="text-gray-700 flex justify-between"><strong className="text-black">Absent: </strong>5</p>
-            <button className="py-2 px-6 bg-[#0D3D66] text-white rounded-full hover:cursor-pointer hover:bg-blue-950 mt-5 w-full">See full detail</button>
+            <h3 className="font-semibold text-[#0D3D66] text-3xl border-b-[#0D3D66] w-full mb-4">
+              Marketing Deparment
+            </h3>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Total workers:</strong>70
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Present: </strong>50
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Leave:</strong> 15
+            </p>
+            <p className="text-gray-700 flex justify-between">
+              <strong className="text-black">Absent: </strong>5
+            </p>
+            <button className="py-2 px-6 bg-[#0D3D66] text-white rounded-full hover:cursor-pointer hover:bg-blue-950 mt-5 w-full">
+              See full detail
+            </button>
           </div>
         </div>
 
