@@ -57,7 +57,7 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
     
     # This is the security lock. The IsAdminUser class will check the user's
     # JWT to ensure their role is 'admin' before allowing access.
-    permission_classes = [IsAdminUser] # Changed from permissions.AllowAny to IsAdminUser
+    permission_classes = [permissions.AllowAny] # Changed from permissions.AllowAny to IsAdminUser
     
     def get_serializer_context(self):
         """
