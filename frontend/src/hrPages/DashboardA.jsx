@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { refreshAccessToken } from "../utils/tokenUtils.js";
+// import { refreshAccessToken } from "../utils/tokenUtils.js";
 import image from '../assets/download.jpeg'
 
 export default function DashboardA() {
@@ -58,11 +58,6 @@ export default function DashboardA() {
     }
 
     try {
-      let accessToken = localStorage.getItem("atoken");
-    const newAccessToken = await refreshAccessToken(); // refreshAccessToken internally checks expiry
-    if (newAccessToken) {
-      accessToken = newAccessToken;
-    }
       const res = await axios.post(
         `${back_url}admin/create-employee/`,
         formData,
