@@ -49,6 +49,7 @@ class AdminRegistrationView(generics.CreateAPIView):
 #         """
 #         return {'role': 'employee'}
 
+
 class EmployeeCreateByAdminView(generics.CreateAPIView):
     """
     Protected API endpoint for an authenticated Admin to create a new Employee user.
@@ -58,7 +59,7 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
     # This is the security lock. The IsAdminUser class will check the user's
     # JWT to ensure their role is 'admin' before allowing access.
     permission_classes = [permissions.AllowAny] # Changed from permissions.AllowAny to IsAdminUser
-    
+
     def get_serializer_context(self):
         """
         Passes the 'role' context to the UserRegistrationSerializer.
