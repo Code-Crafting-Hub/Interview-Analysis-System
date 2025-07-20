@@ -281,9 +281,13 @@ class EmployeeLoginAPIView(TokenObtainPairView):
     """
     serializer_class = CustomTokenObtainPairSerializer
 
+    def get_serializer_context(self):
+        # This tells the login serializer to only accept users with the 'employee' role.
+        return {'expected_role': 'employee'}
+
 class LogoutAPIView(generics.GenericAPIView):
     serializer_class = LogoutSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
