@@ -188,35 +188,90 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .token_serializers import CustomTokenObtainPairSerializer
 
+# class AdminLoginAPIView(APIView):
+#     permission_classes = [permissions.AllowAny]
+
+#     def post(self, request):
+#         email = request.data.get('email')
+#         password = request.data.get('password')
+        
+#         # Manual authentication
+#         try:
+#             user = User.objects.get(email=email)
+#             if user.check_password(password) and user.role == 'admin':
+#                 refresh = RefreshToken.for_user(user)
+#                 return Response({
+#                     'access': str(refresh.access_token),
+#                     'refresh': str(refresh),
+#                     'email': user.email,
+#                     'role': user.role
+#                 })
+#         except User.DoesNotExist:
+#             pass
+        
+#         return Response(
+#             {"detail": "Invalid credentials or not an admin"},
+#             status=status.HTTP_401_UNAUTHORIZED
+#         )
+
+# class EmployeeLoginAPIView(TokenObtainPairView):
+#     serializer_class = CustomTokenObtainPairSerializer
+
+
 class AdminLoginAPIView(APIView):
+    """
+    Handles login requests for users with the 'admin' role.
+    This view performs a manual authentication check.
+    """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        
-        # Manual authentication
+
+        if not email or not password:
+            return Response(
+                {"detail": "Email and password are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
+            # Find the user by email
             user = User.objects.get(email=email)
+            
+            # Check if the password is correct and the user is an admin
             if user.check_password(password) and user.role == 'admin':
                 refresh = RefreshToken.for_user(user)
+                
+                # The response is structured to match the frontend's expectation
+                # with nested tokens.
                 return Response({
-                    'access': str(refresh.access_token),
-                    'refresh': str(refresh),
+                    'tokens': {
+                        'access': str(refresh.access_token),
+                        'refresh': str(refresh),
+                    },
                     'email': user.email,
                     'role': user.role
-                })
+                }, status=status.HTTP_200_OK)
+
         except User.DoesNotExist:
+            # We don't want to reveal if the user exists or not, so we fall through
+            # to the generic error message.
             pass
-        
+
+        # If authentication fails for any reason, return a 401 Unauthorized.
         return Response(
-            {"detail": "Invalid credentials or not an admin"},
+            {"detail": "Invalid credentials or you are not an admin."},
             status=status.HTTP_401_UNAUTHORIZED
         )
 
-class EmployeeLoginAPIView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
 
+# --- Employee Login View ---
+class EmployeeLoginAPIView(TokenObtainPairView):
+    """
+    Handles login for 'employee' roles using the customized serializer.
+    """
+    serializer_class = CustomTokenObtainPairSerializer
 
 class LogoutAPIView(generics.GenericAPIView):
     serializer_class = LogoutSerializer
