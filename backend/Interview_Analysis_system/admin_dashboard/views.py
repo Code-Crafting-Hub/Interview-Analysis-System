@@ -13,9 +13,9 @@ from .serializers import UserRegistrationSerializer, LoginSerializer, LogoutSeri
 from .permissions import IsAdminUser
 
 # Import models and serializers from the other app that this admin panel will manage
-from employee_dashboard.models import Department
-from employee_dashboard.serializers import DepartmentSerializer
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .token_serializers import CustomTokenObtainPairSerializer
 
 class AdminRegistrationView(generics.CreateAPIView):
     """
@@ -32,6 +32,23 @@ class AdminRegistrationView(generics.CreateAPIView):
         return {'role': 'admin'}
 
 
+# class EmployeeCreateByAdminView(generics.CreateAPIView):
+#     """
+#     Protected API endpoint for an authenticated Admin to create a new Employee user.
+#     """
+#     serializer_class = UserRegistrationSerializer
+    
+#     # This is the security lock. The IsAdminUser class will check the user's
+#     # JWT to ensure their role is 'admin' before allowing access.
+#     permission_classes = [permissions.AllowAny]
+    
+#     def get_serializer_context(self):
+#         """
+#         Passes the 'role' context to the UserRegistrationSerializer.
+#         This ensures the serializer validates for an 'employee'.
+#         """
+#         return {'role': 'employee'}
+
 class EmployeeCreateByAdminView(generics.CreateAPIView):
     """
     Protected API endpoint for an authenticated Admin to create a new Employee user.
@@ -40,7 +57,7 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
     
     # This is the security lock. The IsAdminUser class will check the user's
     # JWT to ensure their role is 'admin' before allowing access.
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAdminUser] # Changed from permissions.AllowAny to IsAdminUser
     
     def get_serializer_context(self):
         """
@@ -48,6 +65,7 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
         This ensures the serializer validates for an 'employee'.
         """
         return {'role': 'employee'}
+
 
 
 # class AdminLoginAPIView(generics.GenericAPIView):
@@ -84,16 +102,7 @@ class EmployeeCreateByAdminView(generics.CreateAPIView):
 #         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
-class DepartmentViewSet(viewsets.ModelViewSet):
-    """
-    Protected API endpoint that allows Admins to perform all CRUD
-    (Create, Retrieve, Update, Delete) operations on Departments.
-    """
-    queryset = Department.objects.all()
-    serializer_class = DepartmentSerializer
-    
-    # This endpoint is also locked down so that only Admins can manage departments.
-    permission_classes = [IsAdminUser]
+
 
 class LogoutAPIView(generics.GenericAPIView):
     """
@@ -185,8 +194,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         return context
     
 
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .token_serializers import CustomTokenObtainPairSerializer
 
 # class AdminLoginAPIView(APIView):
 #     permission_classes = [permissions.AllowAny]

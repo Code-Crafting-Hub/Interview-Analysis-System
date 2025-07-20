@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from employee_dashboard.models import Department 
 
 
 class UserManager(BaseUserManager):
@@ -44,7 +43,6 @@ class User(AbstractBaseUser):
     # We make these blank/null because they do not apply to Admins.
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     position = models.CharField(max_length=100, blank=True, null=True)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
     employee_image = models.ImageField(upload_to='employee_images/', blank=True, null=True)
 
     objects = UserManager()

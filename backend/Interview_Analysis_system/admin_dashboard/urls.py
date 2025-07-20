@@ -8,7 +8,6 @@ from .views import (
     EmployeeCreateByAdminView,
     AdminLoginAPIView,
     EmployeeLoginAPIView,
-    DepartmentViewSet,
     LogoutAPIView,
     EmployeeListView,
     EmployeeViewSet 
@@ -16,7 +15,6 @@ from .views import (
 from rest_framework_simplejwt.views import TokenRefreshView
 
 router = DefaultRouter()
-router.register(r'departments', DepartmentViewSet, basename='department')
 router.register(r'admin/employees', EmployeeViewSet, basename='employee')
 
 urlpatterns = [

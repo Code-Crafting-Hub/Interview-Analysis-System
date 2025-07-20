@@ -4,7 +4,6 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
-from employee_dashboard.models import Department
 from rest_framework_simplejwt.exceptions import TokenError
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -14,18 +13,14 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     # --- THIS IS A CRITICAL FIX ---
     # This field correctly handles converting a department name (e.g., "It Department")
     # into the correct Department object when creating a user.
-    department = serializers.SlugRelatedField(
-        queryset=Department.objects.all(),
-        slug_field='name',
-        required=False # We will make it required dynamically
-    )
+    
 
     class Meta:
         model = User
         fields = [
             'full_name', 'email', 'password',
             'admin_phone', 'admin_address', 'admin_image',
-            'phone_number', 'position', 'department',
+            'phone_number', 'position',
             'employee_image'
         ]
         extra_kwargs = {
@@ -42,23 +37,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             self.fields['admin_address'].required = True
             self.fields.pop('phone_number', None)
             self.fields.pop('position', None)
-            self.fields.pop('department', None)
             self.fields.pop('employee_image', None)
         elif role == 'employee':
             # Employee-specific logic (making fields required and removing admin fields)
             self.fields['position'].required = True
-            self.fields['department'].required = True # Now this works correctly
             self.fields.pop('admin_phone', None)
             self.fields.pop('admin_address', None)
             self.fields.pop('admin_image', None)
         else:
             # Logic for when the form is rendered without context
+            # (e.g., in DRF browsable API, if not explicitly passed context)
             self.fields.pop('admin_phone', None)
             self.fields.pop('admin_address', None)
             self.fields.pop('admin_image', None)
             self.fields.pop('phone_number', None)
             self.fields.pop('position', None)
-            self.fields.pop('department', None)
             self.fields.pop('employee_image', None)
 
     def create(self, validated_data):
@@ -111,53 +104,26 @@ class LoginSerializer(serializers.Serializer):
                 'email': user.email,
                 'role': user.role,
             }
-        }    
-
-# class LogoutSerializer(serializers.Serializer):
-#     refresh = serializers.CharField()
-
-#     default_error_messages = {
-#         'bad_token': ('Token is expired or invalid')
-#     }
-
-#     def validate(self, attrs):
-#         self.token = attrs['refresh']
-#         return attrs
-
-#     def save(self, **kwargs):
-#         try:
-#             # This is the line that does the actual work
-#             RefreshToken(self.token).blacklist()
-#         except TokenError:
-#             # This raises an error if the token is already invalid
-#             self.fail('bad_token')
-
-# class LogoutSerializer(serializers.Serializer):
-#     refresh = serializers.CharField()
-#     default_error_messages = {'bad_token': ('Token is expired or invalid')}
-
-#     def validate(self, attrs):
-#         self.token = attrs['refresh']
-#         return attrs
-
-#     def save(self, **kwargs):
-#         try:
-#             token =RefreshToken(self.token)
-#             token.blacklist()
-#         except TokenError:
-#             self.fail('bad_token')
-
-from rest_framework import serializers
+        } 
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 
+    default_error_messages = {
+        'bad_token': ('Token is expired or invalid')
+    }
+
     def validate(self, attrs):
+        self.token = attrs['refresh']
         return attrs
 
     def save(self, **kwargs):
-        # Simply return success - token invalidation handled by JWT rotation
-        return
+        try:
+            # This is the line that does the actual work to blacklist the refresh token
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            # This raises an error if the token is already invalid
+            self.fail('bad_token')
 
 
 class EmployeeListSerializer(serializers.ModelSerializer):
@@ -166,7 +132,6 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     It exposes fields relevant for a list view.
     """
     # Make the department name readable in the response
-    department_name = serializers.CharField(source='department.name', read_only=True)
 
     class Meta:
         model = User
@@ -176,7 +141,6 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             'full_name',
             'email',
             'position',
-            'department_name',
             'phone_number',
             'employee_image'
         ]
