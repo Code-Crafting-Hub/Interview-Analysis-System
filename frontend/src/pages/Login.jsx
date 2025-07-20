@@ -46,6 +46,7 @@ export default function Login() {
       const data = { email, password };
       const dataType = loginType
       if (dataType === "admin") {
+        navigate("/hr/dashboard")
         const res = await axios.post(`${back_Url}admin/login/`, data, {
           headers: {
             "Content-Type": "application/json",
@@ -63,6 +64,7 @@ export default function Login() {
         navigate("/hr/dashboard");
       }
       if(dataType === 'employee'){
+        navigate("/performance")
         const res = await axios.post(`${back_Url}employee/login/`, data, {
           headers: {
             "Content-Type": "application/json",
