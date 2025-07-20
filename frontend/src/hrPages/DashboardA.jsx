@@ -13,7 +13,6 @@ export default function DashboardA() {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [position, setPosition] = React.useState("");
-  const [department, setDepartment] = React.useState();
   const [image, setImage] = React.useState("");
   const [employeeForm, setEmployeeForm] = React.useState(false);
   const [employees, setEmployees] = React.useState([]);
@@ -39,7 +38,6 @@ export default function DashboardA() {
     formData.append("email", email);
     formData.append("password", password);
     formData.append("position", position);
-    formData.append("department", department);
     formData.append("image", image);
     for (let [key, value] of formData.entries()) {
       console.log(key, value);
@@ -49,7 +47,6 @@ export default function DashboardA() {
       !email ||
       !password ||
       !position ||
-      !department ||
       !image
     ) {
       Swal.fire({
@@ -84,7 +81,6 @@ export default function DashboardA() {
       setEmail("");
       setPassword("");
       setPosition("");
-      setDepartment("");
       setImage(null);
       setEmployeeForm(false);
       navigate("/hr/dashboard");
@@ -259,14 +255,6 @@ export default function DashboardA() {
                   placeholder="Position"
                   value={position}
                   onChange={(e) => setPosition(e.target.value)}
-                  required
-                  className="w-full border px-4 py-2 rounded outline-none"
-                />
-                <input
-                  type="text"
-                  placeholder="Department"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
                   required
                   className="w-full border px-4 py-2 rounded outline-none"
                 />
