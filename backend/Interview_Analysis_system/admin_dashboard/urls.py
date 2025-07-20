@@ -10,7 +10,9 @@ from .views import (
     EmployeeLoginAPIView,
     LogoutAPIView,
     EmployeeListView,
-    EmployeeViewSet 
+    EmployeeViewSet,
+    AdminLoginAPIView,
+    EmployeeLoginAPIView,
 )
 from rest_framework_simplejwt.views import TokenRefreshView
 
