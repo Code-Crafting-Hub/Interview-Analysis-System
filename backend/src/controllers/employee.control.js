@@ -131,7 +131,7 @@ const editData = async (req, res) => {
     }
     const employeeValidate = z.object({
       name: z.string().min(1, { message: "Name is required" }),
-      email: z.string().email({ message: "Invalid email" })
+      email: z.string().email({ message: "Invalid email" }),
     });
     const validateData = employeeValidate.safeParse(req.body);
     if (!validateData.success) {
@@ -168,57 +168,66 @@ const editData = async (req, res) => {
   }
 };
 
-const getAllData = async(req,res)=>{
-  const adminId = req.adminId
+const getAllData = async (req, res) => {
+  const adminId = req.adminId;
   try {
-    if(!adminId){
-      return res.json({errors:"Access denied"})
+    if (!adminId) {
+      return res.json({ errors: "Access denied" });
     }
-    const detail = await employeModel.find()
-    res.json(detail)
+    const detail = await employeModel.find();
+    res.json(detail);
   } catch (error) {
-    res.json({errors:"Internal server error in getting data"})
+    res.json({ errors: "Internal server error in getting data" });
   }
-}
+};
 
-const getOneData = async (req,res)=>{
-  const employeId = req.employeId
+const getOneData = async (req, res) => {
+  const employeId = req.employeId;
   try {
-    if(!employeId){
-      return res.json({errors:"Access denied"})
+    if (!employeId) {
+      return res.json({ errors: "Access denied" });
     }
-    const emp = await employeModel.findOne({_id:employeId})
-    if(emp){
-      res.json(emp)
-    }else{
-      res.json({errors:"Data not exists"})
-    }
-  } catch (error) {
-    res.json({errors:"Internal server error"})
-  }
-}
-
-const deleteEmp = async (req,res) =>{
-  const adminId = req.adminId
-  const {employeeId} = req.params
-  try {
-    if(!adminId){
-      return res.json({errors:"Access denied"})
-    }
-    if(!employeeId){
-      return res.json({errors:"Employee id not receive"})
-    }
-    const deleteRes = await employeModel.findOneAndDelete({_id:employeeId})
-    if(deleteRes){
-      res.json({message:"Employee data remove successfully"})
-    }else{
-      res.json({errors:"Employee not exists"})
+    const emp = await employeModel.findOne({ _id: employeId });
+    if (emp) {
+      res.json(emp);
+    } else {
+      res.json({ errors: "Data not exists" });
     }
   } catch (error) {
-    res.json({errors:"Internal server error in deleting employee"})
+    res.json({ errors: "Internal server error" });
   }
-}
+};
 
-const employeControl = { signup, login, logout, editPass, editData, getAllData, getOneData, deleteEmp };
+const deleteEmp = async (req, res) => {
+  const adminId = req.adminId;
+  const { employeeId } = req.params;
+  try {
+    if (!adminId) {
+      return res.json({ errors: "Access denied" });
+    }
+    if (!employeeId) {
+      return res.json({ errors: "Employee id not receive" });
+    }
+    const deleteRes = await employeModel.findOneAndDelete({ _id: employeeId });
+    if (deleteRes) {
+      res.json({ message: "Employee data remove successfully" });
+    } else {
+      res.json({ errors: "Employee not exists" });
+    }
+  } catch (error) {
+    res.json({ errors: "Internal server error in deleting employee" });
+  }
+};
+
+const employeControl = {
+  signup,
+  login,
+  logout,
+  editPass,
+  editData,
+  getAllData,
+  getOneData,
+  deleteEmp,
+};
 
 module.exports = employeControl;

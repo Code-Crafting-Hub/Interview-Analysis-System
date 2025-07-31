@@ -3,8 +3,16 @@ const isAdmin = require("../middleware/isAdmin");
 const employeControl = require("../controllers/employee.control");
 const isEmployee = require("../middleware/isEmployee");
 
-const { signup, login, logout, editPass, editData, getAllData, getOneData, deleteEmp } =
-  employeControl;
+const {
+  signup,
+  login,
+  logout,
+  editPass,
+  editData,
+  getAllData,
+  getOneData,
+  deleteEmp,
+} = employeControl;
 
 const employeRoutes = express.Router();
 
@@ -15,6 +23,6 @@ employeRoutes.put("/updatepass", isEmployee, editPass);
 employeRoutes.put("/updatedata/:employeeId", isAdmin, editData);
 employeRoutes.post("/getall", isAdmin, getAllData);
 employeRoutes.get("/getone", isEmployee, getOneData);
-employeRoutes.delete("/delete/:employeeId", isAdmin, deleteEmp)
+employeRoutes.delete("/delete/:employeeId", isAdmin, deleteEmp);
 
 module.exports = employeRoutes;
