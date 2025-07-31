@@ -6,12 +6,12 @@ const config = require("../../config");
 
 const signup = async (req, res) => {
   const adminId = req.adminId;
-  const { name, phone, email, password } = req.body;
+  const { name, phone, email, password, basicSalary, department } = req.body;
   try {
     if (!adminId) {
       return res.json({ errors: "Access denied" });
     }
-    if (!name || !phone || !email || !password) {
+    if (!name || !phone || !email || !password || !department) {
       return res.json({ errors: "All fields are required" });
     }
     const regex = /^\+91[6-9]\d{9}$/;
@@ -30,6 +30,8 @@ const signup = async (req, res) => {
       password: z
         .string()
         .min(8, { message: "Password should be 8 char long" }),
+      department: z.string(),
+      basicSalary: z.number(),
     });
     const validateData = employeeValidate.safeParse(req.body);
     if (!validateData.success) {
@@ -37,10 +39,13 @@ const signup = async (req, res) => {
     }
     const salt = 10;
     const hashedPassword = await bcrypt.hash(password, salt);
+
     const employeeData = new employeModel({
       name,
       email,
       phone,
+      ...(basicSalary > 0 && { basicSalary }),
+      department,
       password: hashedPassword,
       createrId: adminId,
     });
@@ -119,9 +124,9 @@ const editPass = async (req, res) => {
 const editData = async (req, res) => {
   const adminId = req.adminId;
   const { employeeId } = req.params;
-  const { name, email, phone } = req.body;
+  const { name, email, phone, basicSalary, department } = req.body;
   try {
-    if (!name || !email || !phone) {
+    if (!name || !email || !phone || !basicSalary || !department) {
       return res.json({ errors: "Fill all detail carefully" });
     }
     const regex = /^\+91[6-9]\d{9}$/;
@@ -143,14 +148,15 @@ const editData = async (req, res) => {
     if (!employeeId) {
       return res.json({ errors: "Employee id not receive" });
     }
-    const _id = employeeId;
-    const employee = await employeModel.findOne({ _id });
+    const employee = await employeModel.findOne({ _id: employeeId });
     if (!employee) {
       return res.json({ errors: "Employee not found" });
     }
     const data = {
       name,
       email,
+      basicSalary,
+      department,
       phone,
     };
     const response = await employeModel.findOneAndUpdate(

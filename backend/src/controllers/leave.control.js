@@ -94,6 +94,29 @@ const getELeave = async (req, res) => {
   }
 };
 
-const leaveControl = { createLeave, getAllLeave, approveLeave, getELeave };
+const deleteLeave = async (req, res) => {
+  const adminId = req.adminId
+  const {leaveId} = req.params
+  try {
+    if(!adminId){
+      return res.json({errors:"Access denied"})
+    }
+    if(!leaveId){
+      return res.json({errors:"Leave not receive"})
+    }
+    const resLeave = await leaveModel.findOne({_id:leaveId})
+    if(!resLeave){
+      return res.json({errors:"Leave not found"})
+    }
+    const leaveDelete = await leaveModel.findOneAndDelete({_id:leaveId})
+    if(leaveDelete){
+      res.json({message:"Leave deleted successfully"})
+    }
+  } catch (error) {
+    res.json({errors:"Internal server error in deleting leave"})
+  }
+};
+
+const leaveControl = { createLeave, getAllLeave, approveLeave, getELeave, deleteLeave };
 
 module.exports = leaveControl;

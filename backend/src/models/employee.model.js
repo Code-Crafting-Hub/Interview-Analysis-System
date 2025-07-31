@@ -6,6 +6,8 @@ const employeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    department:String,
+    basicSalary:Number,
     email: String,
     phone: String,
     password: String,
