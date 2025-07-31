@@ -5,6 +5,7 @@ const employeRoutes = require("./src/routes/employe.routes");
 const leaveRouter = require("./src/routes/leave.route");
 const salaryRouter = require("./src/routes/salary.routes");
 const performRouter = require("./src/routes/perform.routes");
+const teamRouter = require("./src/routes/team.route");
 
 const app = express();
 dbConnection();
@@ -16,5 +17,6 @@ app.use("/api/v1/employee", employeRoutes);
 app.use("/api/v1/leave", leaveRouter);
 app.use("/api/v1/salary", salaryRouter);
 app.use("/api/v1/perform", performRouter);
+app.use("/api/v1/team", teamRouter);
 
 module.exports = app;
