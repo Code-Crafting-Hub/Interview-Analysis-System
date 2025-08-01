@@ -8,13 +8,13 @@ const teamSchema = new mongoose.Schema(
     },
     manager: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Employee",
+      ref: "employee",
       required: true
     },
     members: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Employee" 
+        ref: "employee" 
       }
     ],
     projects: [

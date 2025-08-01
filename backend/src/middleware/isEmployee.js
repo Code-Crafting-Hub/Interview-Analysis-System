@@ -18,7 +18,7 @@ const isEmployee = async (req, res, next) => {
     req.employeId = decoded.id;
     next();
   } catch (error) {
-    res.json({ errors: "Internal server error" });
+    res.json({ errors: "Access Denied" });
   }
 };
 

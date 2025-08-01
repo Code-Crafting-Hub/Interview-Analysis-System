@@ -18,7 +18,7 @@ const isAdmin = async (req, res, next) => {
     req.adminId = decoded.id;
     next();
   } catch (error) {
-    res.json({ errors: "Internal server error" });
+    res.json({ errors: "Access Denied" });
   }
 };
 
