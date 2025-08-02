@@ -46,14 +46,13 @@ export default function Login() {
       const data = { email, password };
       const dataType = loginType
       if (dataType === "admin") {
-        navigate("/hr/dashboard")
-        const res = await axios.post(`${back_Url}admin/login/`, data, {
+        const res = await axios.post(`${back_Url}/admin/login`, data, 
+          {withCredentials: true, 
           headers: {
             "Content-Type": "application/json",
           },
         });
-        localStorage.setItem("atoken", res.data.tokens.access);
-        localStorage.setItem("rtoken", res.data.tokens.refresh);
+        localStorage.setItem("token", res.data.token)
         Swal.fire({
           position: "center",
           icon: "success",
@@ -65,12 +64,13 @@ export default function Login() {
       }
       if(dataType === 'employee'){
         navigate("/performance")
-        const res = await axios.post(`${back_Url}employee/login/`, data, {
+        const res = await axios.post(`${back_Url}/employee/login/`, data, {
+          withCredentials:true,
           headers: {
             "Content-Type": "application/json",
           },
         });
-        localStorage.setItem("token", res.data.tokens.access);
+        localStorage.setItem("token", res.data.token);
         Swal.fire({
           position: "center",
           icon: "success",

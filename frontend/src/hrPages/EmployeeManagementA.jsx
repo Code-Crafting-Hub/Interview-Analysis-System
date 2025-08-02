@@ -2,105 +2,97 @@
 import React from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function EmployeeManagementA() {
   const [employeeForm, setEmployeeForm] = React.useState(false);
-  const [full_name, setFullname] = React.useState("");
+  const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [phone, setPhone] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [position, setPosition] = React.useState("");
+  const [salary, setSalary] = React.useState("");
   const [department, setDepartment] = React.useState("");
-  const [image, setImage] = React.useState(null);
+  const navigate = useNavigate();
+  const Token = localStorage.getItem("token");
 
-  const [departments, setDepartments] = React.useState([
-    {
-      name: "Human Resources",
-      employees: [
-        {
-          id: 1,
-          name: "Priya Sharma",
-          email: "priya@company.com",
-          phone: "+91-9876543210",
-          birthday: "1995-08-12",
-          position: "HR Manager",
-          image: "https://randomuser.me/api/portraits/women/12.jpg",
-        },
-        {
-          id: 2,
-          name: "Ankit Verma",
-          email: "ankit@company.com",
-          phone: "+91-9123456780",
-          birthday: "1993-03-20",
-          position: "HR Executive",
-          image: "https://randomuser.me/api/portraits/men/10.jpg",
-        },
-      ],
-    },
-    {
-      name: "Engineering",
-      employees: [
-        {
-          id: 3,
-          name: "Rahul Mehta",
-          email: "rahul@company.com",
-          phone: "+91-9988776655",
-          birthday: "1990-06-15",
-          position: "Software Engineer",
-          image: "https://randomuser.me/api/portraits/men/22.jpg",
-        },
-        {
-          id: 4,
-          name: "Sneha Kapoor",
-          email: "sneha@company.com",
-          phone: "+91-8899776655",
-          birthday: "1996-11-05",
-          position: "Frontend Developer",
-          image: "https://randomuser.me/api/portraits/women/32.jpg",
-        },
-      ],
-    },
-  ]);
+  const basicSalary = Number(salary);
+  const back_url = import.meta.env.VITE_BACKEND_URL;
 
-  const handleAddEmployee = (e) => {
-    e.preventDefault();
-    const newEmp = {
-      id: Date.now(),
-      name: full_name,
-      email,
-      password,
-      phone: "N/A",
-      birthday: "N/A",
-      position,
-      image: image ? URL.createObjectURL(image) : "",
-    };
-
-    const updatedDepartments = departments.map((dept) => {
-      if (dept.name.toLowerCase() === department.toLowerCase()) {
-        return { ...dept, employees: [...dept.employees, newEmp] };
-      }
-      return dept;
-    });
-
-    // If department doesn't exist, add new
-    const deptExists = departments.some(
-      (d) => d.name.toLowerCase() === department.toLowerCase()
-    );
-
-    if (!deptExists) {
-      updatedDepartments.push({
-        name: department,
-        employees: [newEmp],
+  React.useEffect(() => {
+    if (!Token) {
+      navigate("/");
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Access Denied",
+        showConfirmButton: false,
+        timer: 1500,
       });
     }
+  }, []);
 
-    setDepartments(updatedDepartments);
-    setFullname("");
-    setEmail("");
-    setPassword("");
-    setPosition("");
-    setDepartment("");
-    setImage(null);
-    setEmployeeForm(false);
+  const handleAddEmployee = async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      name,
+      email,
+      password,
+      department,
+      basicSalary,
+      phone,
+    };
+
+    if (!name || !email || !password || !department || !phone || !basicSalary) {
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Fill details properly",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${back_url}/employee/signup`, formData, {
+        headers: {
+          Authorization: `Bearer ${Token}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      if (res.data.message) {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: `${res.data.message}`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: `${res.data.errors}`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+
+      setName("");
+      setEmail("");
+      setPassword("");
+      setPhone("");
+      setSalary("");
+      setDepartment("");
+      setEmployeeForm(false);
+    } catch (error) {
+      console.log("error:", error);
+    }
   };
 
   return (
@@ -109,60 +101,29 @@ export default function EmployeeManagementA() {
       <div className="flex flex-col w-full">
         <Navbar name="Employee Management" />
 
-        <div className="p-5 space-y-10">
-          {departments.map((dept, index) => (
-            <div key={index}>
-              <h2 className="text-2xl font-bold mb-4 text-[#0D3D66]">
-                {dept.name}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {dept.employees.map((emp) => (
-                  <div
-                    key={emp.id}
-                    className="bg-white rounded-xl shadow-lg p-4 space-y-2 hover:shadow-2xl transition"
-                  >
-                    <img
-                      src={emp.image}
-                      alt={emp.name}
-                      className="w-24 h-24 rounded-full mx-auto object-cover"
-                    />
-                    <h3 className="text-xl font-semibold text-center">
-                      {emp.name}
-                    </h3>
-                    <p className="text-sm text-center text-gray-500">
-                      {emp.position}
-                    </p>
-                    <p className="text-sm text-center text-gray-500">
-                      📧 {emp.email}
-                    </p>
-                    <p className="text-sm text-center text-gray-500">
-                      📞 {emp.phone}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+        {/* Employee List Placeholder */}
+        <div className="p-5">
+          <p className="text-2xl font-semibold text-gray-700">Employees will be listed here...</p>
         </div>
 
         {/* Add Employee Button */}
         <div className="fixed right-6 w-fit bottom-6">
           <button
-            className="bg-[#0D3D66] text-white text-4xl h-15 w-15 rounded-full hover:cursor-pointer hover:bg-[#145a96]"
+            className="bg-[#0D3D66] text-white rounded-full hover:cursor-pointer hover:bg-[#145a96] p-2 px-4"
             onClick={() => setEmployeeForm(true)}
           >
-            +
+            Add
           </button>
         </div>
 
         {/* Form Modal */}
         {employeeForm && (
           <div
-            className="inset-0 fixed flex bg-black/30 backdrop-blur-sm justify-center items-center z-50"
+            className="inset-0 fixed flex bg-transparent backdrop-blur-[20px] justify-center items-center"
             onClick={() => setEmployeeForm(false)}
           >
             <div
-              className="bg-white text-black p-6 rounded-xl w-[90%] md:w-[60%] lg:w-[50%] 2xl:w-[40%] border-2 shadow-lg"
+              className="bg-[#0D3D66] text-white p-6 rounded-xl w-[90%] md:w-[60%] lg:w-[50%] 2xl:w-[40%] border-2"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-semibold text-center mb-4">
@@ -172,8 +133,16 @@ export default function EmployeeManagementA() {
                 <input
                   type="text"
                   placeholder="Full Name"
-                  value={full_name}
-                  onChange={(e) => setFullname(e.target.value)}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full border px-4 py-2 rounded outline-none"
+                />
+                <input
+                  type="text"
+                  placeholder="Phone number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   required
                   className="w-full border px-4 py-2 rounded outline-none"
                 />
@@ -195,30 +164,64 @@ export default function EmployeeManagementA() {
                 />
                 <input
                   type="text"
-                  placeholder="Position"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
+                  placeholder="Salary"
+                  value={salary}
+                  onChange={(e) => setSalary(e.target.value)}
                   required
                   className="w-full border px-4 py-2 rounded outline-none"
                 />
-                <input
-                  type="text"
-                  placeholder="Department"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  required
-                  className="w-full border px-4 py-2 rounded outline-none"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImage(e.target.files[0])}
-                  required
-                  className="w-full border px-4 py-2 rounded outline-none"
-                />
+                <div className="bg-white p-4 rounded-lg shadow space-y-3 text-black">
+                  <p className="font-semibold text-lg">Select Department:</p>
+
+                  <label
+                    htmlFor="it"
+                    className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-orange-50 transition"
+                  >
+                    <input
+                      type="radio"
+                      id="it"
+                      name="depart"
+                      value="IT Department"
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="accent-orange-600"
+                    />
+                    IT Department
+                  </label>
+
+                  <label
+                    htmlFor="account"
+                    className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-orange-50 transition"
+                  >
+                    <input
+                      type="radio"
+                      id="account"
+                      name="depart"
+                      value="Accounts Department"
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="accent-orange-600"
+                    />
+                    Accounts Department
+                  </label>
+
+                  <label
+                    htmlFor="marketing"
+                    className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer hover:bg-orange-50 transition"
+                  >
+                    <input
+                      type="radio"
+                      id="marketing"
+                      name="depart"
+                      value="Marketing Department"
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="accent-orange-600"
+                    />
+                    Marketing Department
+                  </label>
+                </div>
+
                 <button
                   type="submit"
-                  className="bg-[#0D3D66] text-white px-4 py-2 rounded hover:bg-[#145a96] w-full"
+                  className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 w-full"
                 >
                   Add Employee
                 </button>

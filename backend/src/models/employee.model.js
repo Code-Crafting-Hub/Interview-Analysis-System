@@ -6,12 +6,29 @@ const employeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    department:String,
-    basicSalary:Number,
-    email: String,
-    phone: String,
-    password: String,
-    createrId: String,
+    department:{
+      type: String,
+    },
+    basicSalary:{
+      type: String,
+      required: true
+    },
+    email: {
+      type:String,
+      required: true,
+      unique: true
+    },
+    phone: {
+      type:String,
+      required: true,
+      unique:true
+    },
+    password: {
+      type: String,
+    },
+    createrId:{
+      type:String,
+    },
   },
   { timestamps: true }
 );

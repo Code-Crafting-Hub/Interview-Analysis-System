@@ -18,7 +18,6 @@ const createSalary = async (req, res) => {
     if (!empFind) {
       return res.json({ errors: "Employee not found" });
     }
-    const name = empFind.name;
     const monthHandle = await salaryModel.findOne({
       month,
       employee: employeeId,
@@ -35,7 +34,6 @@ const createSalary = async (req, res) => {
     });
     const data = new salaryModel({
       employeeId,
-      name,
       month,
       bonus: salaryData.bonus,
       deduction: {
@@ -58,7 +56,7 @@ const getAllSalary = async (req, res) => {
     if (!adminId) {
       return res.json({ errors: "Access denied" });
     }
-    const data = await salaryModel.find();
+    const data = await salaryModel.find().populate("employeeId", "name email phone");
     if (data.length === 0) {
       res.json({ message: "No salary slip found" });
     } else {
@@ -75,7 +73,7 @@ const getOneEmpSalary = async (req, res) => {
     if (!employeId) {
       return res.json({ errors: "Access Denied" });
     }
-    const salary = await salaryModel.find({ employeeId: employeId });
+    const salary = await salaryModel.find({ employeeId: employeId }).populate("employeeId","name phone email");
     if (salary.length === 0) {
       res.json({ message: "No salary slip made" });
     } else {

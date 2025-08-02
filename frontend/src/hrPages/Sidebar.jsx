@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import  { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import { SlCalender } from "react-icons/sl";
@@ -17,25 +16,24 @@ import Swal from "sweetalert2";
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const bgColor = "#0D3D66";
+  const Token = localStorage.getItem("token");
   const navigate= useNavigate()
 
   const back_Url = import.meta.env.VITE_BACKEND_URL
 
   const logoutHandler = async () => {
-    const refreshToken = localStorage.getItem("rtoken");
-    const accesToken = localStorage.getItem("atoken")
     try {
       await axios.post(
-      `${back_Url}admin/logout/`,
-      { refresh: refreshToken },
+      `${back_Url}admin/logout`,
       {
         headers: {
+          "Authorization":`Bearer ${Token}`,
           "Content-Type":"application/json"
         },
+        withCreadential:true
       }
     );
-      localStorage.removeItem("atoken")
-      localStorage.removeItem("rtoken")
+      localStorage.removeItem("token")
       Swal.fire({
         position: "center",
         icon: "success",
@@ -45,6 +43,7 @@ export default function Sidebar() {
       });
       navigate("/")
     } catch (error) {
+      console.log(error)
       Swal.fire({
         position: "center",
         icon: "error",

@@ -45,7 +45,7 @@ const getAllLeave = async (req, res) => {
     if (!adminId) {
       return res.json({ errors: "Access Denied" });
     }
-    const data = await leaveModel.find();
+    const data = await leaveModel.find().populate("employeeId","name email phone");
     res.json(data);
   } catch (error) {
     res.json({ errors: "Internal server error" });
@@ -83,7 +83,7 @@ const getELeave = async (req, res) => {
     if (!employeId) {
       return res.json({ errors: "Login first" });
     }
-    const empFind = await leaveModel.find({ employeeId: employeId });
+    const empFind = await leaveModel.find({ employeeId: employeId }).populate("employeeId", "name email phone");
     if (empFind.length === 0) {
       res.json({ message: "No leave to show" });
     } else {

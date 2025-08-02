@@ -5,9 +5,19 @@ const adminScema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  email: String,
-  phone: String,
-  password: String,
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  phone: {
+    type:String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
 });
 
 const adminModel = mongoose.model("admin", adminScema);

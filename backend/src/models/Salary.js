@@ -3,9 +3,15 @@ const { number } = require("zod");
 
 const salarySchema = new mongoose.Schema(
   {
-    employeeId: String,
-    month: String,
-    name:String,
+    employeeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref:"employee",
+      required: true
+    },
+    month: {
+      type: String,
+      requried: true
+    },
     bonus: { type: Number, default: 0 },
     netSalary: Number,
     basicSalary:Number,
