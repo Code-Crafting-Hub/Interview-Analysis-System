@@ -23,8 +23,8 @@ export default function Sidebar() {
 
   const logoutHandler = async () => {
     try {
-      await axios.post(
-      `${back_Url}admin/logout`,
+      const res = await axios.post(
+      `${back_Url}/admin/logout`,
       {
         headers: {
           "Authorization":`Bearer ${Token}`,
@@ -34,14 +34,26 @@ export default function Sidebar() {
       }
     );
       localStorage.removeItem("token")
-      Swal.fire({
+      if(res.data.message){
+        Swal.fire({
         position: "center",
         icon: "success",
-        title: "Logout successfully",
+        title: `${res.data.message}`,
         showConfirmButton: false,
         timer: 1500,
       });
       navigate("/")
+      }else{
+        Swal.fire({
+        position: "center",
+        icon: "error",
+        title: `${res.data.errors}`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      }
+      
+      
     } catch (error) {
       console.log(error)
       Swal.fire({
