@@ -4,35 +4,9 @@ import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 export default function ProfileA() {
   const [data, setData] = useState([]);
-  const backend_Url = import.meta.env.VITE_BACKEND_URL;
-  const Token = localStorage.getItem("token");
-  const navigate = useNavigate();
-
-  const verifyToken = async () => {
-    const verifyAuth = await axios.post(`${backend_Url}/admin/verify`,"",{
-      headers: {
-        Authorization: `Bearer ${Token}`,
-      },
-      withCreadentials: true,
-    });
-    if (!verifyAuth.data.message) {
-      navigate("/");
-      Swal.fire({
-        position: "center",
-        icon: "error",
-        title: `${verifyAuth.data.errors}`,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
-  };
-  React.useEffect(() => {
-    verifyToken();
-  }, []);
 
   useEffect(() => {
     const mockData = [

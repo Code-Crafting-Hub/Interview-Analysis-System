@@ -20,28 +20,6 @@ export default function EmployeeManagementA() {
   const basicSalary = Number(salary);
   const back_url = import.meta.env.VITE_BACKEND_URL;
 
-  const verifyToken = async () => {
-    const verifyAuth = await axios.post(`${back_url}/admin/verify`,"",{
-      headers: {
-        Authorization: `Bearer ${Token}`,
-      },
-      withCreadentials: true,
-    });
-    if (!verifyAuth.data.message) {
-      navigate("/");
-      Swal.fire({
-        position: "center",
-        icon: "error",
-        title: `${verifyAuth.data.errors}`,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
-  };
-  React.useEffect(() => {
-    verifyToken();
-  }, []);
-
   React.useEffect(() => {
     if (!Token) {
       navigate("/");
@@ -141,7 +119,7 @@ export default function EmployeeManagementA() {
         {/* Form Modal */}
         {employeeForm && (
           <div
-            className="inset-0 fixed flex bg-transparent backdrop-blur-[20px] justify-center items-center z-51"
+            className="inset-0 fixed flex bg-transparent backdrop-blur-[20px] justify-center items-center"
             onClick={() => setEmployeeForm(false)}
           >
             <div
@@ -203,7 +181,7 @@ export default function EmployeeManagementA() {
                       type="radio"
                       id="it"
                       name="depart"
-                      value="It Department"
+                      value="IT Department"
                       onChange={(e) => setDepartment(e.target.value)}
                       className="accent-orange-600"
                     />
