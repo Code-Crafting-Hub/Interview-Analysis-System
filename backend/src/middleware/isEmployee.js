@@ -18,6 +18,12 @@ const isEmployee = async (req, res, next) => {
     req.employeId = decoded.id;
     next();
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ errors: "Token expired" });
+    }
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ errors: "Invalid token" });
+    }
     res.json({ errors: "Access Denied" });
   }
 };

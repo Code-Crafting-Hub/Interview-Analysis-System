@@ -23,6 +23,7 @@ employeRoutes.put("/updatepass", isEmployee, editPass);
 employeRoutes.put("/updatedata/:employeeId", isAdmin, editData);
 employeRoutes.post("/getall", isAdmin, getAllData);
 employeRoutes.get("/getone", isEmployee, getOneData);
+employeRoutes.post("/verify", isEmployee)
 employeRoutes.delete("/delete/:employeeId", isAdmin, deleteEmp);
 
 module.exports = employeRoutes;

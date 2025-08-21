@@ -3,13 +3,13 @@ const mongoose = require("mongoose");
 
 const createTeam = async (req, res) => {
   const adminId = req.adminId;
-  const { name, managerId, memberIds, projects } = req.body;
+  const { name, managerId, memberIds, projects, department } = req.body;
 
   try {
     if (!adminId) {
       return res.json({ errors: "Access denied" });
     }
-    if (!name || !managerId || !memberIds || !projects) {
+    if (!name || !managerId || !memberIds || !projects || !department) {
       return res.json({ errors: "All fields are required" });
     }
     const newTeam = new teamModel({
@@ -17,6 +17,7 @@ const createTeam = async (req, res) => {
       manager: managerId,
       members: memberIds,
       projects,
+      department
     });
 
     await newTeam.save();

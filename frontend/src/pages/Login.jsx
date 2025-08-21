@@ -20,7 +20,7 @@ export default function Login() {
   const [pass, setPass] = React.useState("password");
   const navigate = useNavigate("/hr/dashboard");
 
-  const back_Url = import.meta.env.VITE_BACKEND_URL
+  const back_Url = import.meta.env.VITE_BACKEND_URL;
 
   const passViewHandler = () => {
     setPassview((prev) => {
@@ -44,15 +44,15 @@ export default function Login() {
         return;
       }
       const data = { email, password };
-      const dataType = loginType
+      const dataType = loginType;
       if (dataType === "admin") {
-        const res = await axios.post(`${back_Url}/admin/login`, data, 
-          {withCredentials: true, 
+        const res = await axios.post(`${back_Url}/admin/login`, data, {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },
         });
-        localStorage.setItem("token", res.data.token)
+        localStorage.setItem("token", res.data.token);
         Swal.fire({
           position: "center",
           icon: "success",
@@ -62,10 +62,10 @@ export default function Login() {
         });
         navigate("/hr/dashboard");
       }
-      if(dataType === 'employee'){
-        navigate("/performance")
+      if (dataType === "employee") {
+        navigate("/performance");
         const res = await axios.post(`${back_Url}/employee/login/`, data, {
-          withCredentials:true,
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },
@@ -81,7 +81,7 @@ export default function Login() {
         navigate("/performance");
       }
     } catch (error) {
-        console.log(error)
+      console.log(error);
       Swal.fire({
         position: "center",
         icon: "error",
@@ -143,28 +143,35 @@ export default function Login() {
             </div>
             <div className="text-xl my-2 space-x-1">
               <p className="my-2 ">Login as:</p>
-              <input
-                type="radio"
-                id="admin"
-                name="login"
-                value="admin"
-                onClick={() => setLoginType("admin")}
-                className="text-blue-500 hover:cursor-pointer"
-              />
-              <label htmlFor="admin" className="hover:cursor-pointer">
-                Admin
-              </label>
-              <input
-                type="radio"
-                id="employee"
-                name="login"
-                value="employee"
-                onClick={() => setLoginType("employee")}
-                className="text-blue-500 hover:cursor-pointer"
-              />
-              <label htmlFor="employee" className="hover:cursor-pointer">
-                Employee
-              </label>
+              <div className="flex gap-5">
+                <div className="space-x-2">
+                  <input
+                    type="radio"
+                    id="admin"
+                    name="login"
+                    value="admin"
+                    onClick={() => setLoginType("admin")}
+                    className="text-blue-500 hover:cursor-pointer"
+                  />
+                  <label htmlFor="admin" className="hover:cursor-pointer">
+                    Admin
+                  </label>
+                </div>
+
+                <div className="space-x-2">
+                  <input
+                    type="radio"
+                    id="employee"
+                    name="login"
+                    value="employee"
+                    onClick={() => setLoginType("employee")}
+                    className="text-blue-500 hover:cursor-pointer"
+                  />
+                  <label htmlFor="employee" className="hover:cursor-pointer">
+                    Employee
+                  </label>
+                </div>
+              </div>
             </div>
             <div className="text-center">
               <LoginButton name="Login" />
